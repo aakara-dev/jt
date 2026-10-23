@@ -33,6 +33,7 @@ var leaderMenu = []leaderEntry{
 	{"j", "JQL query", "search >", "Find"},
 	{"f", "saved filters", "search *", "Find"},
 
+	{"b", "board (kanban)", "board", "Lists"},
 	{"i", "issues", "issues", "Lists"},
 	{"m", "assigned to me", "mine", "Lists"},
 	{"s", "active sprint", "sprint", "Lists"},
@@ -72,6 +73,7 @@ var globalHints = []Hint{
 
 // commandHelp documents the ":" commands.
 var commandHelp = []Hint{
+	{":board", "sprint / kanban board"},
 	{":issues :mine :sprint :backlog", "issue lists"},
 	{":epics :recent :watching :bugs", "more lists"},
 	{":epic KEY", "issues in an epic"},

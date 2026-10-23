@@ -50,7 +50,10 @@ func TestScreens(t *testing.T) {
 
 	themeName := os.Getenv("JT_SCREENS_THEME")
 	newH := func(opts Options) *harness {
-		h := newHarness(t, &fakeBackend{issues: demoIssues()}, opts)
+		end := time.Now().Add(4 * 24 * time.Hour).Format(time.RFC3339)
+		fb := &fakeBackend{issues: demoIssues(), board: demoBoard(), sprints: []*jira.Sprint{{ID: 7, Name: "DATA Sprint 42", Status: "active", EndDate: end}}}
+		h := newHarness(t, fb, opts)
+		h.app.sess.BoardID = 5
 		if themeName != "" {
 			*h.app.st = newStyles(themeName)
 		}
@@ -103,6 +106,34 @@ func TestScreens(t *testing.T) {
 
 	h.send(runCommandMsg{"theme"})
 	snap(h, "11-theme", "Theme picker (:theme)")
+	h.send(key("esc"))
+
+	h.send(key("t"))
+	snap(h, "12-transition", "Transition picker (t)")
+	h.send(key("esc"))
+
+	h.send(key("v"))
+	h.send(key("v"))
+	h.send(key("j"))
+	h.send(key("v"))
+	snap(h, "13-marked", "Visual marks for bulk actions (v)")
+	h.send(key("esc"))
+
+	h.send(key("n"))
+	h.typeText("Add data contract tests for orders")
+	snap(h, "14-create", "New issue form (n)")
+	h.send(key("esc"))
+
+	h.send(key("c"))
+	h.typeText("Retry policy looks good, ship it.")
+	snap(h, "15-comment", "Comment (c)")
+	h.send(key("esc"))
+
+	h.send(runCommandMsg{"board"})
+	snap(h, "16-board", "Sprint board (:board / space b)")
+	h.send(key("l"))
+	h.send(key("j"))
+	snap(h, "17-board-nav", "Board navigation (h/l columns, j/k cards, H/L move)")
 
 	var page strings.Builder
 	page.WriteString(`<!doctype html><html><head><meta charset="utf-8"><title>jt screens</title><style>

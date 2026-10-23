@@ -58,10 +58,12 @@ func (v *detailView) Selected() *jira.Issue {
 	return &jira.Issue{Key: v.key}
 }
 
+func (v *detailView) Marked() []*jira.Issue { return nil }
+
 func (v *detailView) Hints() []Hint {
 	return []Hint{
 		{"j/k", "scroll"},
-		{"L", "linked issues & subtasks"},
+		{"r", "related: parent, subtasks, links"},
 		{"ctrl+r", "reload"},
 	}
 }
@@ -80,6 +82,14 @@ func (v *detailView) Update(msg tea.Msg) (View, tea.Cmd) {
 		v.width = 0 // force re-render
 		iss := msg.iss
 		return v, func() tea.Msg { return viewedIssueMsg{iss} }
+
+	case issuesChangedMsg:
+		for _, k := range msg.keys {
+			if k == v.key {
+				return v, v.fetch()
+			}
+		}
+		return v, nil
 
 	case tea.KeyPressMsg:
 		key := msg.String()
@@ -101,7 +111,7 @@ func (v *detailView) Update(msg tea.Msg) (View, tea.Cmd) {
 			return v, pop
 		case "ctrl+r":
 			return v, v.fetch()
-		case "L":
+		case "r":
 			return v, v.relatedPicker()
 		}
 	}

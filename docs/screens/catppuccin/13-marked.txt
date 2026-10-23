@@ -1,0 +1,34 @@
+ Issues · DATA (12) [3 marked]  project = "DATA" ORDER BY updated DESC                                                                      
+◆◼ DATA-1       ↑ Add retry with backoff… ● In Progress    Ada Lovelace     2h      │ ◼ DATA-5  ● In Review                                 
+◆✖ DATA-2       ⇈ Nightly orders job fai… ● To Do          Alan Turing      40m     │ Expose freshness metrics in Grafana                   
+ ✔ DATA-3       = Document lineage for t… ● Done           Grace Hopper     3d      │                                                       
+◆◈ DATA-4       = Migrate batch jobs fro… ● In Progress    Ada Lovelace     1d      │ Type      Story                                       
+▌◼ DATA-5       ↓ Expose freshness metri… ● In Review      Linus Torvalds   5h      │ Priority  Low                                         
+ ↳ DATA-6       = Add Delta OPTIMIZE to … ● To Do          –                9d      │ Assignee  Linus Torvalds                              
+ ✖ DATA-7       ↑ dbt incremental model … ● In Progress    Alan Turing      30m     │ Reporter  Grace Hopper                                
+ ◼ DATA-8       = Salt skewed join keys … ● To Do          Margaret Hamilt… 2d      │ Labels    observability                               
+ ✔ DATA-9       ⇊ Clean up stale feature… ● Done           Linus Torvalds   2w      │ Updated   5h ago                                      
+ ◼ DATA-10      ↑ Partition events table… ● To Do          Ada Lovelace     7h      │                                                       
+ ✔ DATA-11      = Rotate service princip… ● In Progress    Margaret Hamilt… 15m     │                                                       
+ ◼ DATA-12      = Backfill 2024 partitio… ● To Do          –                4d      │                                                       
+                                                                                    │                                                       
+                                                                                    │                                                       
+                                                                                    │                                                       
+                                                                                    │                                                       
+                                                                                    │                                                       
+                                                                                    │                                                       
+                                                                                    │                                                       
+                                                                                    │                                                       
+                                                                                    │                                                       
+                                                                                    │                                                       
+                                                                                    │                                                       
+                                                                                    │                                                       
+                                                                                    │                                                       
+                                                                                    │                                                       
+                                                                                    │                                                       
+                                                                                    │                                                       
+                                                                                    │                                                       
+                                                                                    │                                                       
+                                                                                    │                                                       
+                                                                                    │                                                       
+ jt  data  DATA  Issues · DATA                                                                  space menu · : cmd · ctrl+k search · ? help 

@@ -7,37 +7,9 @@ import (
 
 	"github.com/spf13/viper"
 
-	"github.com/aakara-dev/jt/api"
 	"github.com/aakara-dev/jt/internal/cmdutil"
 	jtConfig "github.com/aakara-dev/jt/internal/config"
-	"github.com/aakara-dev/jt/pkg/jira"
 )
-
-// Backend is the slice of the Jira API the TUI needs. It is an interface so
-// the UI can be driven by a fake in tests.
-type Backend interface {
-	Search(jql string, from, limit uint) (*jira.SearchResult, error)
-	Issue(key string) (*jira.Issue, error)
-	FavouriteFilters() ([]*jira.SavedFilter, error)
-}
-
-// jiraBackend talks to Jira Server/DC through the REST v2 client.
-type jiraBackend struct{ c *jira.Client }
-
-// NewJiraBackend wraps a configured Jira client.
-func NewJiraBackend(c *jira.Client) Backend { return jiraBackend{c: c} }
-
-func (b jiraBackend) Search(jql string, from, limit uint) (*jira.SearchResult, error) {
-	return api.ProxySearch(b.c, jql, from, limit)
-}
-
-func (b jiraBackend) Issue(key string) (*jira.Issue, error) {
-	return api.ProxyGetIssue(b.c, key)
-}
-
-func (b jiraBackend) FavouriteFilters() ([]*jira.SavedFilter, error) {
-	return b.c.FavouriteFiltersV2()
-}
 
 // Session is the user-facing state that survives view changes: who we are,
 // which server, and which saved project is active.

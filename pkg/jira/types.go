@@ -69,6 +69,7 @@ type Issue struct {
 
 // IssueStatus is an issue's workflow status.
 type IssueStatus struct {
+	ID       string `json:"id,omitempty"`
 	Name     string `json:"name"`
 	Category struct {
 		Key string `json:"key"` // "new", "indeterminate" or "done"
@@ -189,6 +190,7 @@ type Transition struct {
 	ID          json.Number `json:"id"`
 	Name        string      `json:"name"`
 	IsAvailable bool        `json:"isAvailable"`
+	To          IssueStatus `json:"to"`
 }
 
 // User holds user info.

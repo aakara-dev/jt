@@ -5,6 +5,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/aakara-dev/jt/pkg/jira"
+
 	tea "charm.land/bubbletea/v2"
 	"charm.land/lipgloss/v2"
 
@@ -14,7 +16,7 @@ import (
 const toastTTL = 3 * time.Second
 
 // cycleViews are the lists <tab> rotates through.
-var cycleViews = []string{"issues", "mine", "sprint", "recent"}
+var cycleViews = []string{"issues", "board", "mine", "sprint", "backlog", "recent"}
 
 // App is the root Bubble Tea model: a stack of views, an optional floating
 // popup, and a status bar.
@@ -38,6 +40,8 @@ type App struct {
 
 	startSearch bool
 	searchInput string
+
+	pending pendingEdit // description being edited in $EDITOR
 }
 
 // Options configure how the TUI starts.
@@ -142,6 +146,14 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		a.recent.add(msg.iss)
 		return a, nil
 
+	case pendingEditMsg:
+		a.pending = msg.p
+		return a, nil
+	case editorDoneMsg:
+		if msg.id == a.pending.id {
+			return a, a.finishEdit(msg)
+		}
+
 	case tea.KeyPressMsg:
 		return a, a.handleKey(msg)
 	}
@@ -173,7 +185,7 @@ func (a *App) handleKey(k tea.KeyPressMsg) tea.Cmd {
 		return cmd
 	}
 	top := a.top()
-	if top.Capturing() {
+	if owner, ok := top.(keyOwner); top.Capturing() || (ok && owner.Owns(key)) {
 		var cmd tea.Cmd
 		a.stack[len(a.stack)-1], cmd = top.Update(k)
 		return cmd
@@ -189,14 +201,24 @@ func (a *App) handleKey(k tea.KeyPressMsg) tea.Cmd {
 	case keySearch:
 		return a.openSearch("")
 	case keyHelp:
-		a.popup = helpPopup{view: top.Hints()}
+		a.popup = helpPopup{view: append(top.Hints(), actionHints...)}
 		return nil
+	case "n":
+		return a.createAction()
 	case keyProjectSw:
 		return a.exec("project")
 	case keyNextView:
 		a.cycle = (a.cycle + 1) % len(cycleViews)
+		if cycleViews[a.cycle] == "board" && a.sess.BoardID == 0 {
+			a.cycle = (a.cycle + 1) % len(cycleViews)
+		}
 		return a.exec(cycleViews[a.cycle])
 	case keyBack, keyBackAlt:
+		if key == keyBack && len(top.Marked()) > 0 {
+			var cmd tea.Cmd
+			a.stack[len(a.stack)-1], cmd = top.Update(k) // clears the visual selection
+			return cmd
+		}
 		if len(a.stack) > 1 {
 			return pop
 		}
@@ -204,6 +226,19 @@ func (a *App) handleKey(k tea.KeyPressMsg) tea.Cmd {
 			return tea.Quit
 		}
 		return nil
+	}
+
+	if actionKeys[key] {
+		targets := top.Marked()
+		if len(targets) == 0 {
+			if iss := top.Selected(); iss != nil {
+				targets = []*jira.Issue{iss}
+			}
+		}
+		if len(targets) == 0 {
+			return toast("no issue selected")
+		}
+		return a.issueAction(key, targets)
 	}
 
 	if iss := top.Selected(); iss != nil {
@@ -242,7 +277,7 @@ func (a *App) exec(line string) tea.Cmd {
 	case "q", "quit", "q!", "qa":
 		return tea.Quit
 	case "help", "h":
-		a.popup = helpPopup{view: a.top().Hints()}
+		a.popup = helpPopup{view: append(a.top().Hints(), actionHints...)}
 		return nil
 	case "search", "s", "find":
 		return a.openSearch(arg)
@@ -256,6 +291,12 @@ func (a *App) exec(line string) tea.Cmd {
 			return a.themePicker()
 		}
 		return a.setTheme(arg)
+	case "board", "kanban", "b":
+		if a.sess.BoardID == 0 {
+			return toast("no board for " + a.sess.Project + ": save one with `jt project add NAME KEY --board ...`")
+		}
+		v := newBoardView(a.sess.BoardID, a.backend, a.st)
+		return func() tea.Msg { return replaceViewMsg{v} }
 	case "epic":
 		if arg == "" {
 			return a.replace(BuiltinList("epics", a.sess))
@@ -360,7 +401,7 @@ func (a *App) setTheme(name string) tea.Cmd {
 
 // completions feeds the ":" prompt.
 func (a *App) completions(input string) []string {
-	cands := []string{"project", "theme", "search", "query", "save", "epic", "open", "help", "quit", "project -"}
+	cands := []string{"project", "board", "theme", "search", "query", "save", "epic", "open", "help", "quit", "project -"}
 	cands = append(cands, BuiltinListNames...)
 	for _, c := range a.sess.Projects {
 		cands = append(cands, "project "+c.Name)

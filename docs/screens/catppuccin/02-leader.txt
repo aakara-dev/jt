@@ -4,14 +4,14 @@
  ✔ DATA-3       = Document lineage for t… ● Done           Grace Hopper     3d      │
  ◈ DATA-4       = Migrate batch jobs fro… ● In Progress    Ada Lovelace     1d      │ Type      Story                                      
  ◼ DATA-5       ↓ Expose freshness metri… ● In Review      Linus Torvalds   5h      │ Priority  High                                       
- ↳ DATA-6       = Add Delta OPTIMIZE to … ● To Do          –                9d      │ Assignee  Ada Lovelace                               
- ✖ DATA-7       ↑ db╭──────────────────────────────────────────────────────────────────────────────────────────────────╮                   
- ◼ DATA-8       = Sa│  <leader>                                                                                        │                   
- ✔ DATA-9       ⇊ Cl│ Find                    Lists                   Project                 App                      │                   
- ◼ DATA-10      ↑ Pa│ /  → search             i  → issues             p  → switch project     ?  → help                │
- ✔ DATA-11      = Ro│ k  → jump to issue key  m  → assigned to me     -  → previous project   q  → quit                │───────────────────
- ◼ DATA-12      = Ba│ j  → JQL query          s  → active sprint      t  → theme                                       │
-                    │ f  → saved filters      B  → backlog                                                             │               
+ ↳ DATA-6       = Ad╭──────────────────────────────────────────────────────────────────────────────────────────────────╮                   
+ ✖ DATA-7       ↑ db│  <leader>                                                                                        │                   
+ ◼ DATA-8       = Sa│ Find                    Lists                   Project                 App                      │                   
+ ✔ DATA-9       ⇊ Cl│ /  → search             b  → board (kanban)     p  → switch project     ?  → help                │                   
+ ◼ DATA-10      ↑ Pa│ k  → jump to issue key  i  → issues             -  → previous project   q  → quit                │
+ ✔ DATA-11      = Ro│ j  → JQL query          m  → assigned to me     t  → theme                                       │───────────────────
+ ◼ DATA-12      = Ba│ f  → saved filters      s  → active sprint                                                       │
+                    │                         B  → backlog                                                             │               
                     │                         e  → epics                                                               │               
                     │                         r  → recently viewed                                                     │ transient ADLS
                     │                         w  → watching                                                            │               

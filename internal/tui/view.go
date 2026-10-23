@@ -20,6 +20,15 @@ type View interface {
 	// Selected is the issue under the cursor, if any; global issue actions
 	// (open, copy, branch) act on it.
 	Selected() *jira.Issue
+	// Marked are the issues selected in visual mode; actions apply to all
+	// of them when non-empty.
+	Marked() []*jira.Issue
+}
+
+// keyOwner is implemented by views that use keys which are otherwise global
+// (e.g. the board uses h/l/H/L for columns).
+type keyOwner interface {
+	Owns(key string) bool
 }
 
 // Hint is a key and what it does.

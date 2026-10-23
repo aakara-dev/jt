@@ -46,13 +46,16 @@ type listView struct {
 	filter    textinput.Model
 	pendingG  bool
 	preview   bool
+
+	marked map[string]bool // visual selection by issue key
+	keepAt string          // key to restore the cursor to after a reload
 }
 
 func newListView(spec ListSpec, b Backend, st *styles) *listView {
 	listSeq++
 	in := textinput.New()
 	in.Prompt = "/"
-	return &listView{id: listSeq, spec: spec, backend: b, st: st, filter: in, loading: true, preview: true}
+	return &listView{id: listSeq, spec: spec, backend: b, st: st, filter: in, loading: true, preview: true, marked: map[string]bool{}}
 }
 
 func (v *listView) Init() tea.Cmd { return v.fetch(0) }
@@ -77,12 +80,59 @@ func (v *listView) Selected() *jira.Issue {
 	return v.issues[v.visible[v.cursor]]
 }
 
+func (v *listView) Marked() []*jira.Issue {
+	var out []*jira.Issue
+	for _, iss := range v.issues {
+		if v.marked[iss.Key] {
+			out = append(out, iss)
+		}
+	}
+	return out
+}
+
 func (v *listView) Hints() []Hint {
 	return []Hint{
 		{"/", "filter"},
 		{"p", "toggle preview"},
 		{"enter", "details"},
+		{"v / V", "mark / mark all (bulk actions)"},
+		{"K / J", "rank up / down"},
 		{"ctrl+r", "reload"},
+	}
+}
+
+// reload refetches the first page and keeps the cursor on the same issue.
+func (v *listView) reload() tea.Cmd {
+	if iss := v.Selected(); iss != nil {
+		v.keepAt = iss.Key
+	}
+	return v.fetch(0)
+}
+
+// rank moves the selected issue one place up (-1) or down (+1), both on the
+// board (Agile rank API) and locally.
+func (v *listView) rank(dir int) tea.Cmd {
+	if v.filter.Value() != "" {
+		return toast("clear the filter before ranking")
+	}
+	i := v.cursor
+	j := i + dir
+	if j < 0 || j >= len(v.visible) {
+		return nil
+	}
+	a, b := v.issues[v.visible[i]], v.issues[v.visible[j]]
+	v.issues[v.visible[i]], v.issues[v.visible[j]] = b, a
+	v.cursor = j
+	before, after := b.Key, ""
+	if dir > 0 {
+		before, after = "", b.Key
+	}
+	backend := v.backend
+	return func() tea.Msg {
+		if err := backend.Rank([]string{a.Key}, before, after); err != nil {
+			return tea.BatchMsg{toastErr(err), func() tea.Msg { return changed(a.Key) }}
+		}
+		return toastMsg{text: "ranked " + a.Key}
 	}
 }
 
@@ -144,7 +194,18 @@ func (v *listView) Update(msg tea.Msg) (View, tea.Cmd) {
 		}
 		v.total = max(msg.result.Total, len(v.issues))
 		v.applyFilter()
+		if v.keepAt != "" {
+			for i, idx := range v.visible {
+				if v.issues[idx].Key == v.keepAt {
+					v.cursor = i
+				}
+			}
+			v.keepAt = ""
+		}
 		return v, nil
+
+	case issuesChangedMsg:
+		return v, v.reload()
 
 	case tea.KeyPressMsg:
 		if v.filtering {
@@ -180,8 +241,31 @@ func (v *listView) Update(msg tea.Msg) (View, tea.Cmd) {
 		case "p":
 			v.preview = !v.preview
 		case "ctrl+r":
-			v.cursor = 0
-			return v, v.fetch(0)
+			return v, v.reload()
+		case "v":
+			if iss := v.Selected(); iss != nil {
+				v.marked[iss.Key] = !v.marked[iss.Key]
+				if !v.marked[iss.Key] {
+					delete(v.marked, iss.Key)
+				}
+				return v, v.move(1)
+			}
+		case "V":
+			if len(v.marked) > 0 {
+				v.marked = map[string]bool{}
+			} else {
+				for _, idx := range v.visible {
+					v.marked[v.issues[idx].Key] = true
+				}
+			}
+		case "esc":
+			if len(v.marked) > 0 {
+				v.marked = map[string]bool{}
+			}
+		case "K":
+			return v, v.rank(-1)
+		case "J":
+			return v, v.rank(1)
 		case "enter", "l", "right":
 			if iss := v.Selected(); iss != nil {
 				return v, push(newDetailView(iss.Key, v.backend, v.st))
@@ -269,6 +353,9 @@ func (v *listView) renderHeader(width int) string {
 		count += fmt.Sprintf(" of %d", v.total)
 	}
 	title := st.Title.Render(v.spec.Title) + " " + st.Muted.Render("("+count+")")
+	if n := len(v.marked); n > 0 {
+		title += " " + st.Accent2.Bold(true).Render(fmt.Sprintf("[%d marked]", n))
+	}
 	if v.loading {
 		title += " " + st.Warn.Render("⟳")
 	}
@@ -314,9 +401,15 @@ func (v *listView) renderRows(width, height int) string {
 		}
 		cells = append(cells, st.Muted.Render(fit(ago(f.Updated), colUpdated)))
 		line := strings.Join(cells, " ")
-		if i == v.cursor {
+		mark := v.marked[iss.Key]
+		switch {
+		case i == v.cursor && mark:
+			line = st.RowSelected.Foreground(st.Palette.Accent2).Width(width).Render("◆" + ansiStrip(line))
+		case i == v.cursor:
 			line = st.RowSelected.Width(width).Render("▌" + ansiStrip(line))
-		} else {
+		case mark:
+			line = st.RowMarked.Render("◆") + line
+		default:
 			line = " " + line
 		}
 		rows = append(rows, line)

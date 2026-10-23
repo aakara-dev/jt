@@ -1,6 +1,7 @@
 package tui
 
 import (
+	"encoding/json"
 	"fmt"
 	"reflect"
 	"strings"
@@ -18,12 +19,108 @@ import (
 
 type jtCtx = jtConfig.SavedProject
 
-// fakeBackend serves canned issues and records the JQL it was asked for.
+// fakeBackend serves canned issues and records the JQL it was asked for
+// and every write it received.
 type fakeBackend struct {
-	mu      sync.Mutex
-	issues  []*jira.Issue
-	queries []string
-	err     error
+	mu       sync.Mutex
+	issues   []*jira.Issue
+	queries  []string
+	calls    []string
+	err      error
+	writeErr error
+	board    *jira.BoardConfig
+	sprints  []*jira.Sprint
+}
+
+func (f *fakeBackend) record(format string, a ...any) error {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	f.calls = append(f.calls, fmt.Sprintf(format, a...))
+	return f.writeErr
+}
+
+func (f *fakeBackend) callLog() []string {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	return append([]string(nil), f.calls...)
+}
+
+// statusIDs maps the sample statuses onto board column ids.
+var statusIDs = map[string]string{"To Do": "1", "In Progress": "3", "In Review": "4", "Done": "10001"}
+
+func (f *fakeBackend) Transitions(key string) ([]*jira.Transition, error) {
+	var out []*jira.Transition
+	for i, name := range []string{"To Do", "In Progress", "Done"} {
+		t := &jira.Transition{ID: json.Number(fmt.Sprint(11 * (i + 1))), Name: "Move to " + name}
+		t.To.ID, t.To.Name = statusIDs[name], name
+		out = append(out, t)
+	}
+	return out, nil
+}
+
+func (f *fakeBackend) Transition(key string, t *jira.Transition) error {
+	return f.record("transition %s %s", key, t.Name)
+}
+
+func (f *fakeBackend) AssignableUsers(project, query string) ([]*jira.User, error) {
+	return []*jira.User{{Name: "alan", DisplayName: "Alan Turing"}}, nil
+}
+func (f *fakeBackend) Assign(key, user string) error { return f.record("assign %s %s", key, user) }
+func (f *fakeBackend) Comment(key, body string) error {
+	return f.record("comment %s %s", key, body)
+}
+
+func (f *fakeBackend) Worklog(key, spent, comment string) error {
+	return f.record("worklog %s %s|%s", key, spent, comment)
+}
+
+func (f *fakeBackend) Edit(key string, req *jira.EditRequest) error {
+	return f.record("edit %s summary=%q priority=%q labels=%v", key, req.Summary, req.Priority, req.Labels)
+}
+
+func (f *fakeBackend) Create(req *jira.CreateRequest) (*jira.CreateResponse, error) {
+	err := f.record("create %s %s %q prio=%s assignee=%s epic=%s", req.Project, req.IssueType, req.Summary, req.Priority, req.Assignee, req.ParentIssueKey)
+	return &jira.CreateResponse{Key: "DATA-99"}, err
+}
+
+func (f *fakeBackend) Watch(key, user string, on bool) error {
+	return f.record("watch %s %s %v", key, user, on)
+}
+
+func (f *fakeBackend) LinkTypes() ([]*jira.IssueLinkType, error) {
+	return []*jira.IssueLinkType{{Name: "Blocks", Inward: "is blocked by", Outward: "blocks"}}, nil
+}
+
+func (f *fakeBackend) Link(in, out, typ string) error {
+	return f.record("link in=%s out=%s %s", in, out, typ)
+}
+func (f *fakeBackend) Delete(key string) error { return f.record("delete %s", key) }
+
+func (f *fakeBackend) Board(id int) (*jira.BoardConfig, error) {
+	if f.board == nil {
+		return nil, fmt.Errorf("no board %d", id)
+	}
+	return f.board, nil
+}
+
+func (f *fakeBackend) Sprints(boardID int, states string) ([]*jira.Sprint, error) {
+	return f.sprints, nil
+}
+
+func (f *fakeBackend) SprintIssues(id int, jql string) (*jira.SearchResult, error) {
+	return &jira.SearchResult{Issues: f.issues, Total: len(f.issues)}, nil
+}
+
+func (f *fakeBackend) BoardIssues(id int, jql string) (*jira.SearchResult, error) {
+	return &jira.SearchResult{Issues: f.issues, Total: len(f.issues)}, nil
+}
+
+func (f *fakeBackend) MoveToSprint(id int, keys []string) error {
+	return f.record("sprint %d %v", id, keys)
+}
+func (f *fakeBackend) MoveToBacklog(keys []string) error { return f.record("backlog %v", keys) }
+func (f *fakeBackend) Rank(keys []string, before, after string) error {
+	return f.record("rank %v before=%s after=%s", keys, before, after)
 }
 
 func (f *fakeBackend) Search(jql string, from, limit uint) (*jira.SearchResult, error) {
@@ -64,6 +161,7 @@ func issue(key, summary, status, category string) *jira.Issue {
 	iss.Fields.Summary = summary
 	iss.Fields.Status.Name = status
 	iss.Fields.Status.Category.Key = category
+	iss.Fields.Status.ID = statusIDs[status]
 	iss.Fields.IssueType.Name = "Story"
 	iss.Fields.Priority.Name = "High"
 	iss.Fields.Assignee.Name = "Ada Lovelace"

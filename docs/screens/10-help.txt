@@ -1,34 +1,34 @@
- Issues · DATA (12)  project = "DATA" ORDER BY updated DESC                                                                                 
-▌◼ DATA-1       ↑ Add retry with backoff… ● In Progress    Ada Lovelace     2h      │ ◼ DATA-1  ● In Progress
- ✖ DATA-2       ⇈ Nightly orders job fai… ● To Do          Alan Turing      40m     │ Add retry with backoff to the orders loader
- ✔ DATA-3       = Document lineage for t… ● Done           Grace Hopper     3d      │
- ◈ DATA-4       = M╭───────────────────────────────────────────────────────────────────────────────────────────────────╮                   
- ◼ DATA-5       ↓ E│  help                                                                                             │                   
- ↳ DATA-6       = A│ Global                                   This view                                                │                   
- ✖ DATA-7       ↑ d│ j/k ↓/↑          move                    /       filter                                           │                   
- ◼ DATA-8       = S│ gg / G           top / bottom            p       toggle preview                                   │                   
- ✔ DATA-9       ⇊ C│ ctrl+d / ctrl+u  half page down / up     enter   details                                          │                   
- ◼ DATA-10      ↑ P│ enter / l        open                    ctrl+r  reload                                           │
- ✔ DATA-11      = R│ esc / q / h      back                                                                             │───────────────────
- ◼ DATA-12      = B│ space            leader menu             Commands                                                 │
-                   │ ctrl+k  space /  floating search         :issues :mine :sprint :backlog  issue lists              │               
-                   │ :                command line            :epics :recent :watching :bugs  more lists               │               
-                   │ ctrl+p           switch project          :epic KEY                       issues in an epic        │ transient ADLS
-                   │ tab              cycle list views        :project [name|-]  :p           switch project           │               
-                   │ o                open in browser         :query JQL|NAME                 run JQL or a saved query │               
-                   │ y / Y            copy key / URL          :save NAME                      save current list's JQL  │               
-                   │ b                copy git branch name    :search [text]                  floating search          │               
-                   │ ctrl+r           refresh                 :theme [name]                   change theme             │ckoff          
-                   │ ?                help                    :KEY-123                        open an issue            │               
-                   │ ctrl+c           quit                    :q / :quit                      quit                     │               
+ Issues · DATA (12)╭───────────────────────────────────────────────────────────────────────────────────────────────────╮                    
+▌◼ DATA-1       ↑ A│  help                                                                                             │
+ ✖ DATA-2       ⇈ N│ Global                                   This view                                                │rs loader
+ ✔ DATA-3       = D│ j/k ↓/↑          move                    /       filter                                           │
+ ◈ DATA-4       = M│ gg / G           top / bottom            p       toggle preview                                   │                   
+ ◼ DATA-5       ↓ E│ ctrl+d / ctrl+u  half page down / up     enter   details                                          │                   
+ ↳ DATA-6       = A│ enter / l        open                    v / V   mark / mark all (bulk actions)                   │                   
+ ✖ DATA-7       ↑ d│ esc / q / h      back                    K / J   rank up / down                                   │                   
+ ◼ DATA-8       = S│ space            leader menu             ctrl+r  reload                                           │                   
+ ✔ DATA-9       ⇊ C│ ctrl+k  space /  floating search         t       transition                                       │                   
+ ◼ DATA-10      ↑ P│ :                command line            a / A   assign / assign to me                            │
+ ✔ DATA-11      = R│ ctrl+p           switch project          c       comment                                          │───────────────────
+ ◼ DATA-12      = B│ tab              cycle list views        e / E   edit field / edit description in $EDITOR         │
+                   │ o                open in browser         n       new issue                                        │               
+                   │ y / Y            copy key / URL          w       log work (e.g. 1h 30m fixed it)                  │               
+                   │ b                copy git branch name    L       link to another issue                            │ transient ADLS
+                   │ ctrl+r           refresh                 W       watch / unwatch                                  │               
+                   │ ?                help                    m / B   move to sprint / backlog                         │               
+                   │ ctrl+c           quit                    D       delete (asks first)                              │               
+                   │                                                                                                   │               
+                   │                                          Commands                                                 │ckoff          
+                   │                                          :board                          sprint / kanban board    │               
+                   │                                          :issues :mine :sprint :backlog  issue lists              │               
+                   │                                          :epics :recent :watching :bugs  more lists               │
+                   │                                          :epic KEY                       issues in an epic        │
+                   │                                          :project [name|-]  :p           switch project           │
+                   │                                          :query JQL|NAME                 run JQL or a saved query │
+                   │                                          :save NAME                      save current list's JQL  │
+                   │                                          :search [text]                  floating search          │
+                   │                                          :theme [name]                   change theme             │
+                   │                                          :KEY-123                        open an issue            │
+                   │                                          :q / :quit                      quit                     │
                    │ esc close                                                                                         │
-                   ╰───────────────────────────────────────────────────────────────────────────────────────────────────╯
-                                                                                    │
-                                                                                    │
-                                                                                    │
-                                                                                    │
-                                                                                    │
-                                                                                    │
-                                                                                    │
-                                                                                    │
- jt  data  DATA  Issues · DATA                                                                  space menu · : cmd · ctrl+k search · ? help 
+ jt  data  DATA  Is╰───────────────────────────────────────────────────────────────────────────────────────────────────╯l+k search · ? help 
