@@ -11,6 +11,7 @@ import (
 	"github.com/aakara-dev/jt/api"
 	"github.com/aakara-dev/jt/internal/cmd/board"
 	"github.com/aakara-dev/jt/internal/cmd/completion"
+	"github.com/aakara-dev/jt/internal/cmd/ctx"
 	"github.com/aakara-dev/jt/internal/cmd/epic"
 	initCmd "github.com/aakara-dev/jt/internal/cmd/init"
 	"github.com/aakara-dev/jt/internal/cmd/issue"
@@ -34,8 +35,9 @@ const (
 )
 
 var (
-	config string
-	debug  bool
+	config      string
+	contextName string
+	debug       bool
 )
 
 func init() {
@@ -62,8 +64,19 @@ func init() {
 		viper.AutomaticEnv()
 		viper.SetEnvPrefix("jt")
 
-		if err := viper.ReadInConfig(); err == nil && debug {
+		if err := viper.ReadInConfig(); err != nil {
+			return
+		}
+		if debug {
 			fmt.Printf("Using config file: %s\n", viper.ConfigFileUsed())
+		}
+
+		override := contextName
+		if override == "" {
+			override = env.Get("CONTEXT")
+		}
+		if err := jiraConfig.ApplyContext(viper.GetViper(), jiraConfig.ActiveContext(viper.GetViper(), override)); err != nil {
+			cmdutil.Failed("Error: %s", err)
 		}
 	})
 }
@@ -74,12 +87,15 @@ func NewCmdRoot() *cobra.Command {
 		Use:   "jt <command> <subcommand>",
 		Short: "Interactive Jira CLI",
 		Long:  "Interactive Jira command line.",
+
+		SilenceUsage:  true,
+		SilenceErrors: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return cmd.Help()
 		},
 		PersistentPreRun: func(cmd *cobra.Command, _ []string) {
 			subCmd := cmd.Name()
-			if !cmdRequireToken(subCmd) {
+			if !cmdRequireToken(subCmd) || cmd.Annotations[ctx.SkipTokenAnnotation] == "true" {
 				return
 			}
 
@@ -111,9 +127,15 @@ func NewCmdRoot() *cobra.Command {
 			configHome, jiraConfig.Dir, jiraConfig.FileName,
 		),
 	)
+	cmd.PersistentFlags().StringVar(
+		&contextName, "context", "",
+		"Context to use for this command instead of the current one (or set JT_CONTEXT)",
+	)
 	cmd.PersistentFlags().BoolVar(&debug, "debug", false, "Turn on debug output")
 
 	cmd.SetHelpFunc(helpFunc)
+
+	_ = cmd.RegisterFlagCompletionFunc("context", ctx.CompleteContexts)
 
 	_ = viper.BindPFlag("config", cmd.PersistentFlags().Lookup("config"))
 	_ = viper.BindPFlag("project.key", cmd.PersistentFlags().Lookup("project"))
@@ -127,6 +149,7 @@ func NewCmdRoot() *cobra.Command {
 func addChildCommands(cmd *cobra.Command) {
 	cmd.AddCommand(
 		initCmd.NewCmdInit(),
+		ctx.NewCmdCtx(),
 		issue.NewCmdIssue(),
 		epic.NewCmdEpic(),
 		sprint.NewCmdSprint(),
