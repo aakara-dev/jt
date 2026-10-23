@@ -8,13 +8,13 @@
  ✖ DATA-7       ↑ dbt incremental model … ● In Progress    Alan Turing      30m     │ Reporter  Grace Hopper                               
  ◼ DATA-8       = Salt skewed join ╭────────────────────────────────────────────────────────────────────╮ reliability                      
  ✔ DATA-9       ⇊ Clean up stale fe│  cmdline                                                           │                                  
- ◼ DATA-10      ↑ Partition events │ : ctx                                                              │
- ✔ DATA-11      = Rotate service pr│  ctx -                                                             │──────────────────────────────────
- ◼ DATA-12      = Backfill 2024 par│  ctx data                                                          │
-                                   │  ctx ops                                                           │                              
-                                   │ tab complete · ↑ history · enter run                               │                              
-                                   ╰────────────────────────────────────────────────────────────────────╯s load fails on transient ADLS
-                                                                                    │   errors.                                        
+ ◼ DATA-10      ↑ Partition events │ : pro                                                              │
+ ✔ DATA-11      = Rotate service pr│  project                                                           │──────────────────────────────────
+ ◼ DATA-12      = Backfill 2024 par│  project -                                                         │
+                                   │  project data                                                      │                              
+                                   │  project ops                                                       │                              
+                                   │ tab complete · ↑ history · enter run                               │s load fails on transient ADLS
+                                   ╰────────────────────────────────────────────────────────────────────╯                              
                                                                                     │                                                  
                                                                                     │   ### Acceptance criteria                        
                                                                                     │                                                  

@@ -10,7 +10,7 @@ import (
 
 func testRoot() *cobra.Command {
 	root := &cobra.Command{Use: "jt"}
-	root.PersistentFlags().String("context", "", "")
+	root.PersistentFlags().StringP("project", "p", "", "")
 	root.PersistentFlags().Bool("debug", false, "")
 	root.AddCommand(&cobra.Command{Use: "issue", Aliases: []string{"i"}})
 	return root
@@ -36,9 +36,10 @@ func TestExpand(t *testing.T) {
 		{"not an alias", []string{"issue", "list"}, nil, ""},
 		{"builtin alias wins", []string{"i", "list"}, nil, ""},
 		{"unknown flag first", []string{"--nope", "start"}, nil, ""},
-		{"global flags first", []string{"--context", "ops", "--debug", "blocked"}, &Expansion{Args: []string{"issue", "list", "-s", "Blocked", "-pDATA", "--context", "ops", "--debug"}}, ""},
+		{"global flags first", []string{"-p", "ops", "--debug", "blocked"}, &Expansion{Args: []string{"issue", "list", "-s", "Blocked", "-pDATA", "-p", "ops", "--debug"}}, ""},
+		{"short flag with value", []string{"-pops", "blocked"}, &Expansion{Args: []string{"issue", "list", "-s", "Blocked", "-pDATA", "-pops"}}, ""},
 		{"no args", nil, nil, ""},
-		{"shell with global flags", []string{"--context=ops", "sh", "x"}, &Expansion{Shell: `echo aakara "$@"`, Args: []string{"x"}, Env: []string{"JT_CONTEXT=ops"}}, ""},
+		{"shell with global flags", []string{"--project=ops", "sh", "x"}, &Expansion{Shell: `echo aakara "$@"`, Args: []string{"x"}, Env: []string{"JT_PROJECT=ops"}}, ""},
 		{"positional", []string{"start", "DATA-1"}, &Expansion{Args: []string{"issue", "move", "DATA-1", "In Progress"}}, ""},
 		{"positional with quote", []string{"start", "it's"}, &Expansion{Args: []string{"issue", "move", "it's", "In Progress"}}, ""},
 		{"extra args appended", []string{"blocked", "--plain"}, &Expansion{Args: []string{"issue", "list", "-s", "Blocked", "-pDATA", "--plain"}}, ""},
@@ -61,14 +62,15 @@ func TestExpand(t *testing.T) {
 }
 
 func TestScanFlags(t *testing.T) {
-	cfg, ctx := scanFlags([]string{"mine", "-c", "/tmp/a.yml", "--context=ops"})
+	cfg, ctx := scanFlags([]string{"mine", "-c", "/tmp/a.yml", "--project=ops"})
 	assert.Equal(t, "/tmp/a.yml", cfg)
 	assert.Equal(t, "ops", ctx)
 
-	cfg, ctx = scanFlags([]string{"mine", "--config=/b.yml", "--context", "data", "--", "-c", "x"})
+	cfg, ctx = scanFlags([]string{"mine", "--config=/b.yml", "-p", "data", "--", "-c", "x"})
 	assert.Equal(t, "/b.yml", cfg)
 	assert.Equal(t, "data", ctx)
 
-	cfg, _ = scanFlags([]string{"-c/c.yml"})
+	cfg, ctx = scanFlags([]string{"-c/c.yml", "-pOPS"})
 	assert.Equal(t, "/c.yml", cfg)
+	assert.Equal(t, "OPS", ctx)
 }

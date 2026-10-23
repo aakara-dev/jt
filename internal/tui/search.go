@@ -28,7 +28,7 @@ var searchModes = []searchMode{
 	{"#", "key", "jump to an issue key (#123 uses the current project)"},
 	{"@", "people", "assigned to or reported by a user (@me)"},
 	{"*", "saved", "saved queries and favourite filters"},
-	{"!", "everywhere", "text search across all contexts"},
+	{"!", "everywhere", "text search across all saved projects"},
 }
 
 var (
@@ -150,13 +150,13 @@ func (p *searchPopup) recentResults() []searchResult {
 
 func (p *searchPopup) savedResults(q string) []searchResult {
 	var items []pickItem
-	names := make([]string, 0, len(p.sess.Saved))
-	for n := range p.sess.Saved {
+	names := make([]string, 0, len(p.sess.Queries))
+	for n := range p.sess.Queries {
 		names = append(names, n)
 	}
 	sort.Strings(names)
 	for _, n := range names {
-		items = append(items, pickItem{Label: n, Detail: "saved", Value: p.sess.ExpandJQL(p.sess.Saved[n])})
+		items = append(items, pickItem{Label: n, Detail: "saved", Value: p.sess.ExpandJQL(p.sess.Queries[n])})
 	}
 	for _, f := range p.favourites {
 		items = append(items, pickItem{Label: f.Name, Detail: "filter " + f.ID, Value: f.JQL})
@@ -205,9 +205,9 @@ func SearchJQL(sess Session, input string) string {
 		return and(sess.ProjectClause(), fmt.Sprintf("(assignee = %s OR reporter = %s)", user, user)) + " ORDER BY updated DESC"
 	case "everywhere":
 		var keys []string
-		for _, c := range sess.Contexts {
-			if c.Project != "" {
-				keys = append(keys, fmt.Sprintf("%q", c.Project))
+		for _, c := range sess.Projects {
+			if c.Key != "" {
+				keys = append(keys, fmt.Sprintf("%q", c.Key))
 			}
 		}
 		scope := ""
@@ -216,7 +216,7 @@ func SearchJQL(sess Session, input string) string {
 		}
 		return and(scope, textClause(q, esc)) + " ORDER BY updated DESC"
 	case "saved":
-		if jql, ok := sess.Saved[q]; ok {
+		if jql, ok := sess.Queries[q]; ok {
 			return sess.ExpandJQL(jql)
 		}
 		return ""

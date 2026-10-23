@@ -80,12 +80,12 @@ func TestScreens(t *testing.T) {
 	h.send(key("esc"))
 
 	h.send(key(":"))
-	h.typeText("ctx")
+	h.typeText("pro")
 	snap(h, "06-cmdline", "Command line with completion (:)")
 	h.send(key("esc"))
 
-	h.send(key("ctrl+x"))
-	snap(h, "07-contexts", "Context switcher (ctrl+x / :ctx)")
+	h.send(key("ctrl+p"))
+	snap(h, "07-projects", "Project switcher (ctrl+p / :project)")
 	h.send(key("esc"))
 
 	h.send(key("/"))

@@ -7,7 +7,6 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/aakara-dev/jt/internal/cmd/ctx"
 	"github.com/aakara-dev/jt/internal/cmdutil"
 	jtConfig "github.com/aakara-dev/jt/internal/config"
 	"github.com/aakara-dev/jt/internal/theme"
@@ -16,7 +15,7 @@ import (
 const help = `Aliases are shortcuts for jt commands, stored under aliases: in the config.
 
 Expansions may use:
-  {me} {project} {board}  your login and the active context's project/board
+  {me} {project} {board}  your login and the active project's key/board
   $1 $2 ...               positional arguments; unused arguments are appended
   !<shell command>        run through sh, arguments are available as "$@"`
 
@@ -34,7 +33,7 @@ func NewCmdAlias() *cobra.Command {
 		Long:        help,
 		Example:     examples,
 		Aliases:     []string{"aliases"},
-		Annotations: map[string]string{ctx.SkipTokenAnnotation: "true"},
+		Annotations: map[string]string{cmdutil.SkipTokenAnnotation: "true"},
 		Args:        cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			return list(cmd.OutOrStdout())
@@ -49,7 +48,7 @@ func newCmdList() *cobra.Command {
 		Use:         "list",
 		Short:       "List aliases",
 		Aliases:     []string{"ls"},
-		Annotations: map[string]string{ctx.SkipTokenAnnotation: "true"},
+		Annotations: map[string]string{cmdutil.SkipTokenAnnotation: "true"},
 		Args:        cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			return list(cmd.OutOrStdout())
@@ -61,7 +60,7 @@ func newCmdSet() *cobra.Command {
 	return &cobra.Command{
 		Use:         "set NAME EXPANSION",
 		Short:       "Create or update an alias",
-		Annotations: map[string]string{ctx.SkipTokenAnnotation: "true"},
+		Annotations: map[string]string{cmdutil.SkipTokenAnnotation: "true"},
 		Args:        cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			name, expansion := args[0], args[1]
@@ -96,7 +95,7 @@ func newCmdDelete() *cobra.Command {
 		Use:         "delete NAME",
 		Short:       "Delete a user alias (defaults come back)",
 		Aliases:     []string{"rm", "remove"},
-		Annotations: map[string]string{ctx.SkipTokenAnnotation: "true"},
+		Annotations: map[string]string{cmdutil.SkipTokenAnnotation: "true"},
 		Args:        cobra.ExactArgs(1),
 		ValidArgsFunction: func(*cobra.Command, []string, string) ([]string, cobra.ShellCompDirective) {
 			f, err := jtConfig.LoadCurrent()

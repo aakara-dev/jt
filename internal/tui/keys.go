@@ -15,7 +15,7 @@ const (
 	keyCopyURL   = "Y"
 	keyCopyBr    = "b"
 	keyNextView  = "tab"
-	keyContextSw = "ctrl+x" // quick context picker, like k9s :ctx
+	keyProjectSw = "ctrl+p" // quick project picker, like k9s :ctx
 )
 
 // leaderEntry is one item in the <space> which-key menu.
@@ -42,9 +42,9 @@ var leaderMenu = []leaderEntry{
 	{"w", "watching", "watching", "Lists"},
 	{"u", "updated today", "updated", "Lists"},
 
-	{"c", "switch context", "ctx", "Context"},
-	{"-", "previous context", "ctx -", "Context"},
-	{"t", "theme", "theme", "Context"},
+	{"p", "switch project", "project", "Project"},
+	{"-", "previous project", "project -", "Project"},
+	{"t", "theme", "theme", "Project"},
 
 	{"?", "help", "help", "App"},
 	{"q", "quit", "q", "App"},
@@ -60,7 +60,7 @@ var globalHints = []Hint{
 	{"space", "leader menu"},
 	{"ctrl+k  space /", "floating search"},
 	{":", "command line"},
-	{"ctrl+x", "switch context"},
+	{"ctrl+p", "switch project"},
 	{"tab", "cycle list views"},
 	{"o", "open in browser"},
 	{"y / Y", "copy key / URL"},
@@ -75,7 +75,7 @@ var commandHelp = []Hint{
 	{":issues :mine :sprint :backlog", "issue lists"},
 	{":epics :recent :watching :bugs", "more lists"},
 	{":epic KEY", "issues in an epic"},
-	{":ctx [name|-]", "switch context"},
+	{":project [name|-]  :p", "switch project"},
 	{":query JQL|NAME", "run JQL or a saved query"},
 	{":save NAME", "save current list's JQL"},
 	{":search [text]", "floating search"},

@@ -36,7 +36,7 @@ type Expansion struct {
 	Args []string
 	// Shell is set for "!" aliases: run it with sh -c, Args as "$@".
 	Shell string
-	// Env carries global flags given before a shell alias (JT_CONTEXT,
+	// Env carries global flags given before a shell alias (JT_PROJECT,
 	// JT_CONFIG_FILE) so nested jt calls in the script honour them.
 	Env []string
 }
@@ -48,22 +48,27 @@ type Vars struct {
 	Board   string
 }
 
-// VarsFromFile reads substitution values for the active context.
-func VarsFromFile(f *jtConfig.File, contextOverride string) Vars {
+// VarsFromFile reads substitution values for the project selected by
+// selector (-p value: a saved name or Jira key), or the current project.
+func VarsFromFile(f *jtConfig.File, selector string) Vars {
 	v := Vars{
 		Me:      f.GetString("login"),
 		Project: f.GetString("project", "key"),
 		Board:   f.GetString("board", "id"),
 	}
-	ctx := contextOverride
-	if ctx == "" {
-		ctx = f.GetString(jtConfig.KeyCurrentContext)
+	name := f.Resolve(selector)
+	switch {
+	case selector != "" && name == "":
+		v.Project, v.Board = selector, ""
+		return v
+	case name == "":
+		name = f.GetString(jtConfig.KeyCurrentProject)
 	}
-	if ctx != "" {
-		if p := f.GetString(jtConfig.KeyContexts, ctx, "project", "key"); p != "" {
+	if name != "" {
+		if p := f.GetString(jtConfig.KeyProjects, name, "project", "key"); p != "" {
 			v.Project = p
 		}
-		v.Board = f.GetString(jtConfig.KeyContexts, ctx, "board", "id")
+		v.Board = f.GetString(jtConfig.KeyProjects, name, "board", "id")
 	}
 	return v
 }
@@ -124,12 +129,12 @@ func Expand(root *cobra.Command, args []string, aliases map[string]string, vars 
 
 	if shell, ok := strings.CutPrefix(body, "!"); ok {
 		var envs []string
-		cfg, ctx := scanFlags(lead)
+		cfg, proj := scanFlags(lead)
 		if cfg != "" {
 			envs = append(envs, env.Prefix+"CONFIG_FILE="+cfg)
 		}
-		if ctx != "" {
-			envs = append(envs, env.Prefix+"CONTEXT="+ctx)
+		if proj != "" {
+			envs = append(envs, env.Prefix+"PROJECT="+proj)
 		}
 		return &Expansion{Shell: shell, Args: args[1:], Env: envs}, nil
 	}
@@ -208,9 +213,9 @@ func shellQuote(s string) string {
 // JT_CONFIG_FILE or the default) and expands args[0] if it is an alias.
 // A missing or unreadable config only disables user aliases.
 func Resolve(root *cobra.Command, args []string) (*Expansion, error) {
-	cfgPath, ctxName := scanFlags(args)
-	if ctxName == "" {
-		ctxName = env.Get("CONTEXT")
+	cfgPath, selector := scanFlags(args)
+	if selector == "" {
+		selector = env.Get("PROJECT")
 	}
 
 	user := map[string]string{}
@@ -218,15 +223,15 @@ func Resolve(root *cobra.Command, args []string) (*Expansion, error) {
 	if path, err := jtConfig.Path(cfgPath); err == nil {
 		if f, err := jtConfig.LoadFile(path); err == nil {
 			user = f.StringMap(jtConfig.KeyAliases)
-			vars = VarsFromFile(f, ctxName)
+			vars = VarsFromFile(f, selector)
 		}
 	}
 	return Expand(root, args, Merge(user), vars)
 }
 
-// scanFlags finds --config/-c and --context anywhere in args without a
+// scanFlags finds --config/-c and --project/-p anywhere in args without a
 // full parse; aliases are resolved before cobra sees the command line.
-func scanFlags(args []string) (cfg, context string) {
+func scanFlags(args []string) (cfg, project string) {
 	for i := 0; i < len(args); i++ {
 		a := args[i]
 		next := func() string {
@@ -238,18 +243,20 @@ func scanFlags(args []string) (cfg, context string) {
 		}
 		switch {
 		case a == "--":
-			return cfg, context
+			return cfg, project
 		case a == "-c" || a == "--config":
 			cfg = next()
 		case strings.HasPrefix(a, "--config="):
 			cfg = strings.TrimPrefix(a, "--config=")
 		case strings.HasPrefix(a, "-c") && len(a) > 2 && !strings.HasPrefix(a, "--"):
 			cfg = a[2:]
-		case a == "--context":
-			context = next()
-		case strings.HasPrefix(a, "--context="):
-			context = strings.TrimPrefix(a, "--context=")
+		case a == "-p" || a == "--project":
+			project = next()
+		case strings.HasPrefix(a, "--project="):
+			project = strings.TrimPrefix(a, "--project=")
+		case strings.HasPrefix(a, "-p") && len(a) > 2 && !strings.HasPrefix(a, "--"):
+			project = a[2:]
 		}
 	}
-	return cfg, context
+	return cfg, project
 }

@@ -42,7 +42,7 @@ type pickItem struct {
 	Value         string
 }
 
-// picker is a fuzzy-filtered list (contexts, themes, saved queries, ...).
+// picker is a fuzzy-filtered list (projects, themes, saved queries, ...).
 type picker struct {
 	title    string
 	items    []pickItem

@@ -13,8 +13,8 @@
  ◼ DATA-12      = B│ space            leader menu             Commands                                                 │
                    │ ctrl+k  space /  floating search         :issues :mine :sprint :backlog  issue lists              │               
                    │ :                command line            :epics :recent :watching :bugs  more lists               │               
-                   │ ctrl+x           switch context          :epic KEY                       issues in an epic        │ transient ADLS
-                   │ tab              cycle list views        :ctx [name|-]                   switch context           │               
+                   │ ctrl+p           switch project          :epic KEY                       issues in an epic        │ transient ADLS
+                   │ tab              cycle list views        :project [name|-]  :p           switch project           │               
                    │ o                open in browser         :query JQL|NAME                 run JQL or a saved query │               
                    │ y / Y            copy key / URL          :save NAME                      save current list's JQL  │               
                    │ b                copy git branch name    :search [text]                  floating search          │               

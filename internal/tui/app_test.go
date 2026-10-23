@@ -16,7 +16,7 @@ import (
 	"github.com/aakara-dev/jt/pkg/jira"
 )
 
-type jtCtx = jtConfig.Context
+type jtCtx = jtConfig.SavedProject
 
 // fakeBackend serves canned issues and records the JQL it was asked for.
 type fakeBackend struct {
@@ -88,12 +88,12 @@ func testSession() Session {
 	return Session{
 		Server:  "https://jira.example.com",
 		Login:   "aakara",
-		Context: "data",
+		Name:    "data",
 		Project: "DATA",
-		Saved:   map[string]string{"blocked": "project = {project} AND status = Blocked"},
-		Contexts: []jtCtx{
-			{Name: "data", Project: "DATA", Current: true},
-			{Name: "ops", Project: "OPS"},
+		Queries: map[string]string{"blocked": "project = {project} AND status = Blocked"},
+		Projects: []jtCtx{
+			{Name: "data", Key: "DATA", Current: true},
+			{Name: "ops", Key: "OPS"},
 		},
 	}
 }
@@ -176,8 +176,8 @@ func key(s string) tea.KeyPressMsg {
 		return tea.KeyPressMsg{Code: tea.KeyDown}
 	case "ctrl+k":
 		return tea.KeyPressMsg{Code: 'k', Mod: tea.ModCtrl}
-	case "ctrl+x":
-		return tea.KeyPressMsg{Code: 'x', Mod: tea.ModCtrl}
+	case "ctrl+p":
+		return tea.KeyPressMsg{Code: 'p', Mod: tea.ModCtrl}
 	}
 	r := []rune(s)[0]
 	return tea.KeyPressMsg{Code: r, Text: s}
@@ -202,7 +202,7 @@ func TestStartsOnProjectList(t *testing.T) {
 	assert.Contains(t, s, "Add retry to the loader")
 	assert.Contains(t, s, "In Progress")
 	assert.Contains(t, s, "jt")
-	assert.Contains(t, s, "data", "status bar shows the context")
+	assert.Contains(t, s, "data", "status bar shows the saved project")
 }
 
 func TestNavigateToDetailAndBack(t *testing.T) {
@@ -363,14 +363,14 @@ func TestSearchShowsRecentWhenEmpty(t *testing.T) {
 	assert.Contains(t, h.screen(), "recently viewed")
 }
 
-func TestContextPickerOpens(t *testing.T) {
+func TestProjectPickerOpens(t *testing.T) {
 	h := newHarness(t, &fakeBackend{issues: sampleIssues(1)}, Options{})
-	h.send(key("ctrl+x"))
+	h.send(key("ctrl+p"))
 	pk, ok := h.app.popup.(*picker)
 	require.True(t, ok)
-	assert.Equal(t, 0, pk.cursor, "cursor starts on the current context")
+	assert.Equal(t, 0, pk.cursor, "cursor starts on the current project")
 	s := h.screen()
-	assert.Contains(t, s, "contexts")
+	assert.Contains(t, s, "projects")
 	assert.Contains(t, s, "ops")
 }
 
@@ -381,11 +381,11 @@ func TestSessionChangeResetsStack(t *testing.T) {
 	require.Len(t, h.app.stack, 2)
 
 	s := testSession()
-	s.Context, s.Project = "ops", "OPS"
+	s.Name, s.Project = "ops", "OPS"
 	h.send(sessionChangedMsg{s})
 	assert.Len(t, h.app.stack, 1)
 	assert.Equal(t, `project = "OPS" ORDER BY updated DESC`, b.lastQuery())
-	assert.Contains(t, h.screen(), "context ops · OPS")
+	assert.Contains(t, h.screen(), "project ops · OPS")
 }
 
 func TestStartOnIssue(t *testing.T) {

@@ -19,6 +19,9 @@ import (
 	"github.com/aakara-dev/jt/pkg/tui"
 )
 
+// SkipTokenAnnotation marks commands that work without a Jira API token.
+const SkipTokenAnnotation = "jt/skip-token"
+
 // ExitIfError exists with error message if err is not nil.
 func ExitIfError(err error) {
 	if err == nil {

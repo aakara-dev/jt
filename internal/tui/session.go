@@ -40,50 +40,50 @@ func (b jiraBackend) FavouriteFilters() ([]*jira.SavedFilter, error) {
 }
 
 // Session is the user-facing state that survives view changes: who we are,
-// which server, and which context/project is active.
+// which server, and which saved project is active.
 type Session struct {
 	Server   string
 	Login    string
-	Context  string
+	Name     string // saved project name (current_project)
 	Project  string
 	BoardID  int
-	Contexts []jtConfig.Context
-	Saved    map[string]string // saved_queries from config
+	Projects []jtConfig.SavedProject
+	Queries  map[string]string // saved_queries from config
 	Theme    string
 }
 
-// LoadSession snapshots the current viper state (after the context overlay).
+// LoadSession snapshots the current viper state (after the project overlay).
 func LoadSession() Session {
 	s := Session{
 		Server:  strings.TrimRight(viper.GetString("server"), "/"),
 		Login:   viper.GetString("login"),
-		Context: viper.GetString(jtConfig.KeyCurrentContext),
+		Name:    viper.GetString(jtConfig.KeyCurrentProject),
 		Project: viper.GetString("project.key"),
 		BoardID: viper.GetInt("board.id"),
-		Saved:   viper.GetStringMapString(jtConfig.KeySavedQueries),
+		Queries: viper.GetStringMapString(jtConfig.KeySavedQueries),
 		Theme:   viper.GetString("theme"),
 	}
 	if f, err := jtConfig.LoadCurrent(); err == nil {
-		s.Contexts = f.Contexts()
+		s.Projects = f.Projects()
 	}
 	return s
 }
 
-// SwitchContext persists name as the current context, re-applies it to
+// SwitchProject persists name as the current project, re-applies it to
 // viper and returns the refreshed session.
-func SwitchContext(name string) (Session, error) {
+func SwitchProject(name string) (Session, error) {
 	f, err := jtConfig.LoadCurrent()
 	if err != nil {
 		return Session{}, err
 	}
-	name, err = f.UseContext(name)
+	name, err = f.UseProject(name)
 	if err != nil {
 		return Session{}, err
 	}
 	if err := f.Save(); err != nil {
 		return Session{}, err
 	}
-	if err := jtConfig.ApplyContext(viper.GetViper(), name); err != nil {
+	if err := jtConfig.ApplyProject(viper.GetViper(), name); err != nil {
 		return Session{}, err
 	}
 	return LoadSession(), nil

@@ -136,7 +136,7 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		spec, _ := BuiltinList(a.defaultList(), a.sess)
 		v := newListView(spec, a.backend, a.st)
 		a.stack = []View{v}
-		return a, tea.Batch(v.Init(), toast("context "+a.sess.Context+" · "+a.sess.Project))
+		return a, tea.Batch(v.Init(), toast("project "+a.sess.Name+" · "+a.sess.Project))
 
 	case viewedIssueMsg:
 		a.recent.add(msg.iss)
@@ -191,8 +191,8 @@ func (a *App) handleKey(k tea.KeyPressMsg) tea.Cmd {
 	case keyHelp:
 		a.popup = helpPopup{view: top.Hints()}
 		return nil
-	case keyContextSw:
-		return a.exec("ctx")
+	case keyProjectSw:
+		return a.exec("project")
 	case keyNextView:
 		a.cycle = (a.cycle + 1) % len(cycleViews)
 		return a.exec(cycleViews[a.cycle])
@@ -246,11 +246,11 @@ func (a *App) exec(line string) tea.Cmd {
 		return nil
 	case "search", "s", "find":
 		return a.openSearch(arg)
-	case "ctx", "context":
+	case "project", "p", "proj", "ctx":
 		if arg == "" {
-			return a.contextPicker()
+			return a.projectPicker()
 		}
-		return switchContext(arg)
+		return switchProject(arg)
 	case "theme":
 		if arg == "" {
 			return a.themePicker()
@@ -265,7 +265,7 @@ func (a *App) exec(line string) tea.Cmd {
 		if arg == "" {
 			return a.openSearch("*")
 		}
-		if jql, ok := a.sess.Saved[arg]; ok {
+		if jql, ok := a.sess.Queries[arg]; ok {
 			return push(newListView(QueryList(arg, a.sess.ExpandJQL(jql)), a.backend, a.st))
 		}
 		return push(newListView(QueryList("JQL", arg), a.backend, a.st))
@@ -280,7 +280,7 @@ func (a *App) exec(line string) tea.Cmd {
 		if err := SaveQuery(arg, lv.spec.JQL); err != nil {
 			return toastErr(err)
 		}
-		a.sess.Saved[arg] = lv.spec.JQL
+		a.sess.Queries[arg] = lv.spec.JQL
 		return toast("saved query " + arg)
 	case "open":
 		if issueKeyRe.MatchString(arg) {
@@ -306,9 +306,9 @@ func (a *App) replace(spec ListSpec, ok bool) tea.Cmd {
 	return func() tea.Msg { return replaceViewMsg{v} }
 }
 
-func switchContext(name string) tea.Cmd {
+func switchProject(name string) tea.Cmd {
 	return func() tea.Msg {
-		s, err := SwitchContext(name)
+		s, err := SwitchProject(name)
 		if err != nil {
 			return toastMsg{text: err.Error(), err: true}
 		}
@@ -316,13 +316,13 @@ func switchContext(name string) tea.Cmd {
 	}
 }
 
-func (a *App) contextPicker() tea.Cmd {
-	if len(a.sess.Contexts) == 0 {
-		return toast("no contexts: add one with `jt ctx add NAME`")
+func (a *App) projectPicker() tea.Cmd {
+	if len(a.sess.Projects) == 0 {
+		return toast("no saved projects: add one with `jt project add NAME KEY`")
 	}
-	items := make([]pickItem, 0, len(a.sess.Contexts))
-	for _, c := range a.sess.Contexts {
-		detail := c.Project
+	items := make([]pickItem, 0, len(a.sess.Projects))
+	for _, c := range a.sess.Projects {
+		detail := c.Key
 		if c.Board != "" {
 			detail += " · " + c.Board
 		}
@@ -331,9 +331,9 @@ func (a *App) contextPicker() tea.Cmd {
 		}
 		items = append(items, pickItem{Label: c.Name, Detail: detail, Value: c.Name})
 	}
-	a.popup = newPicker("contexts", items, func(it pickItem) tea.Cmd {
-		return switchContext(it.Value)
-	}).cursorTo(a.sess.Context)
+	a.popup = newPicker("projects", items, func(it pickItem) tea.Cmd {
+		return switchProject(it.Value)
+	}).cursorTo(a.sess.Name)
 	return nil
 }
 
@@ -360,15 +360,15 @@ func (a *App) setTheme(name string) tea.Cmd {
 
 // completions feeds the ":" prompt.
 func (a *App) completions(input string) []string {
-	cands := []string{"ctx", "theme", "search", "query", "save", "epic", "open", "help", "quit", "ctx -"}
+	cands := []string{"project", "theme", "search", "query", "save", "epic", "open", "help", "quit", "project -"}
 	cands = append(cands, BuiltinListNames...)
-	for _, c := range a.sess.Contexts {
-		cands = append(cands, "ctx "+c.Name)
+	for _, c := range a.sess.Projects {
+		cands = append(cands, "project "+c.Name)
 	}
 	for _, n := range theme.Names() {
 		cands = append(cands, "theme "+n)
 	}
-	for n := range a.sess.Saved {
+	for n := range a.sess.Queries {
 		cands = append(cands, "query "+n)
 	}
 	return fuzzyFilter(strings.TrimPrefix(input, ":"), cands)
@@ -378,7 +378,7 @@ func (a *App) completions(input string) []string {
 func (a *App) View() tea.View {
 	v := tea.NewView(a.render())
 	v.AltScreen = true
-	v.WindowTitle = "jt · " + a.sess.Context
+	v.WindowTitle = "jt · " + a.sess.Name
 	return v
 }
 
@@ -399,11 +399,11 @@ func (a *App) render() string {
 
 func (a *App) statusBar() string {
 	st := *a.st
-	ctx := a.sess.Context
-	if ctx == "" {
-		ctx = "no context"
+	name := a.sess.Name
+	if name == "" {
+		name = "no project"
 	}
-	left := st.StatusKey.Render("jt") + st.StatusCtx.Render(ctx)
+	left := st.StatusKey.Render("jt") + st.StatusCtx.Render(name)
 	if a.sess.Project != "" {
 		left += st.StatusDim.Render(a.sess.Project)
 	}

@@ -8,7 +8,7 @@
  ✖ DATA-7       ↑ dbt incremental model … ● In Progress    Alan Turing      30m     │ Reporter  Grace Hopper                               
  ◼ DATA-8       = Salt skewed join keys … ● To Do          Margaret Hamilt… 2d      │ Labels    pipeline, reliability                      
  ✔ DATA-9       ⇊ Clean up stale fe╭────────────────────────────────────────────────────────────────────╮                                  
- ◼ DATA-10      ↑ Partition events │  contexts                                                          │
+ ◼ DATA-10      ↑ Partition events │  projects                                                          │
  ✔ DATA-11      = Rotate service pr│ › type to filter                                                   │──────────────────────────────────
  ◼ DATA-12      = Backfill 2024 par│ ▌data                              DATA  (current)                 │
                                    │  ops                               OPS                             │                              

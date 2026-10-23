@@ -48,7 +48,7 @@ type (
 	closePopupMsg struct{}
 	// runCommandMsg executes a ":" command line.
 	runCommandMsg struct{ line string }
-	// sessionChangedMsg is sent after a context switch.
+	// sessionChangedMsg is sent after a project switch.
 	sessionChangedMsg struct{ s Session }
 	// viewedIssueMsg records an issue in the recent list.
 	viewedIssueMsg struct{ iss *jira.Issue }

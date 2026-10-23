@@ -23,8 +23,8 @@ board:
 issue:
   types:
     - name: Task
-current_context: data
-contexts:
+current_project: data
+projects:
   data:
     project:
       key: DATA
@@ -54,10 +54,10 @@ func newViper(t *testing.T, path string) *viper.Viper {
 	return v
 }
 
-func TestApplyContextReplacesProjectKeys(t *testing.T) {
+func TestApplyProjectReplacesProjectKeys(t *testing.T) {
 	v := newViper(t, writeSample(t))
 
-	require.NoError(t, ApplyContext(v, "data"))
+	require.NoError(t, ApplyProject(v, "data"))
 
 	assert.Equal(t, "DATA", v.GetString("project.key"))
 	assert.Equal(t, "", v.GetString("project.type"), "context keys replace, not merge")
@@ -65,47 +65,47 @@ func TestApplyContextReplacesProjectKeys(t *testing.T) {
 	assert.Equal(t, "", v.GetString("board.type"))
 	assert.Equal(t, "https://jira.example.com", v.GetString("server"), "server-wide keys untouched")
 	assert.Len(t, v.Get("issue.types"), 1, "keys absent from the context keep top-level values")
-	assert.Equal(t, "data", v.GetString(KeyCurrentContext))
+	assert.Equal(t, "data", v.GetString(KeyCurrentProject))
 }
 
-func TestApplyContextEmptyBoard(t *testing.T) {
+func TestApplyProjectEmptyBoard(t *testing.T) {
 	v := newViper(t, writeSample(t))
 
-	require.NoError(t, ApplyContext(v, "ops"))
+	require.NoError(t, ApplyProject(v, "ops"))
 
 	assert.Equal(t, "OPS", v.GetString("project.key"))
 	assert.Equal(t, "", v.GetString("board.id"))
 }
 
-func TestApplyContextUnknown(t *testing.T) {
+func TestApplyProjectUnknown(t *testing.T) {
 	v := newViper(t, writeSample(t))
 
-	assert.ErrorContains(t, ApplyContext(v, "nope"), `context "nope" not found`)
-	assert.NoError(t, ApplyContext(v, ""))
+	assert.ErrorContains(t, ApplyProject(v, "nope"), `project "nope" not found`)
+	assert.NoError(t, ApplyProject(v, ""))
 	assert.Equal(t, "DEF", v.GetString("project.key"))
 }
 
-func TestFileUseContextAndSwapBack(t *testing.T) {
+func TestFileUseProjectAndSwapBack(t *testing.T) {
 	p := writeSample(t)
 	f, err := LoadFile(p)
 	require.NoError(t, err)
 
-	name, err := f.UseContext("ops")
+	name, err := f.UseProject("ops")
 	require.NoError(t, err)
 	assert.Equal(t, "ops", name)
 	require.NoError(t, f.Save())
 
 	f, err = LoadFile(p)
 	require.NoError(t, err)
-	assert.Equal(t, "ops", f.GetString(KeyCurrentContext))
-	assert.Equal(t, "data", f.GetString(KeyPreviousContext))
+	assert.Equal(t, "ops", f.GetString(KeyCurrentProject))
+	assert.Equal(t, "data", f.GetString(KeyPreviousProject))
 
-	name, err = f.UseContext("-")
+	name, err = f.UseProject("-")
 	require.NoError(t, err)
 	assert.Equal(t, "data", name)
-	assert.Equal(t, "ops", f.GetString(KeyPreviousContext))
+	assert.Equal(t, "ops", f.GetString(KeyPreviousProject))
 
-	_, err = f.UseContext("missing")
+	_, err = f.UseProject("missing")
 	assert.Error(t, err)
 }
 
@@ -128,23 +128,23 @@ func TestFileSavePreservesComments(t *testing.T) {
 	assert.Equal(t, os.FileMode(0o600), info.Mode().Perm())
 }
 
-func TestFileContextsAndRenameDelete(t *testing.T) {
+func TestFileProjectsAndRenameDelete(t *testing.T) {
 	f, err := LoadFile(writeSample(t))
 	require.NoError(t, err)
 
-	ctxs := f.Contexts()
+	ctxs := f.Projects()
 	require.Len(t, ctxs, 2)
-	assert.Equal(t, Context{Name: "data", Project: "DATA", Board: "Data board", BoardID: "142", Current: true}, ctxs[0])
-	assert.Equal(t, "OPS", ctxs[1].Project)
+	assert.Equal(t, SavedProject{Name: "data", Key: "DATA", Board: "Data board", BoardID: "142", Current: true}, ctxs[0])
+	assert.Equal(t, "OPS", ctxs[1].Key)
 
-	require.NoError(t, f.RenameContext("data", "analytics"))
-	assert.Equal(t, "analytics", f.GetString(KeyCurrentContext))
-	assert.Error(t, f.RenameContext("ops", "analytics"))
-	assert.Error(t, f.RenameContext("ops", "bad name"))
+	require.NoError(t, f.RenameProject("data", "analytics"))
+	assert.Equal(t, "analytics", f.GetString(KeyCurrentProject))
+	assert.Error(t, f.RenameProject("ops", "analytics"))
+	assert.Error(t, f.RenameProject("ops", "bad name"))
 
-	require.NoError(t, f.DeleteContext("analytics"))
-	assert.Equal(t, "", f.GetString(KeyCurrentContext))
-	assert.Error(t, f.DeleteContext("analytics"))
+	require.NoError(t, f.DeleteProject("analytics"))
+	assert.Equal(t, "", f.GetString(KeyCurrentProject))
+	assert.Error(t, f.DeleteProject("analytics"))
 }
 
 func TestLoadFileMissing(t *testing.T) {
@@ -152,9 +152,20 @@ func TestLoadFileMissing(t *testing.T) {
 	assert.ErrorIs(t, err, ErrNoConfig)
 }
 
-func TestValidateContextName(t *testing.T) {
-	assert.NoError(t, ValidateContextName("data-eng.v2"))
-	assert.Error(t, ValidateContextName("-"))
-	assert.Error(t, ValidateContextName("has space"))
-	assert.Error(t, ValidateContextName(""))
+func TestValidateProjectName(t *testing.T) {
+	assert.NoError(t, ValidateProjectName("data-eng.v2"))
+	assert.Error(t, ValidateProjectName("-"))
+	assert.Error(t, ValidateProjectName("has space"))
+	assert.Error(t, ValidateProjectName(""))
+}
+
+func TestFileResolve(t *testing.T) {
+	f, err := LoadFile(writeSample(t))
+	require.NoError(t, err)
+
+	assert.Equal(t, "data", f.Resolve("data"))
+	assert.Equal(t, "ops", f.Resolve("ops"))
+	assert.Equal(t, "ops", f.Resolve("OPS"), "Jira key resolves to the saved project")
+	assert.Equal(t, "", f.Resolve("NOPE"))
+	assert.Equal(t, "", f.Resolve(""))
 }

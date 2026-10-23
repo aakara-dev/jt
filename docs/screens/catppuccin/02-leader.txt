@@ -7,9 +7,9 @@
  ↳ DATA-6       = Add Delta OPTIMIZE to … ● To Do          –                9d      │ Assignee  Ada Lovelace                               
  ✖ DATA-7       ↑ db╭──────────────────────────────────────────────────────────────────────────────────────────────────╮                   
  ◼ DATA-8       = Sa│  <leader>                                                                                        │                   
- ✔ DATA-9       ⇊ Cl│ Find                    Lists                   Context                 App                      │                   
- ◼ DATA-10      ↑ Pa│ /  → search             i  → issues             c  → switch context     ?  → help                │
- ✔ DATA-11      = Ro│ k  → jump to issue key  m  → assigned to me     -  → previous context   q  → quit                │───────────────────
+ ✔ DATA-9       ⇊ Cl│ Find                    Lists                   Project                 App                      │                   
+ ◼ DATA-10      ↑ Pa│ /  → search             i  → issues             p  → switch project     ?  → help                │
+ ✔ DATA-11      = Ro│ k  → jump to issue key  m  → assigned to me     -  → previous project   q  → quit                │───────────────────
  ◼ DATA-12      = Ba│ j  → JQL query          s  → active sprint      t  → theme                                       │
                     │ f  → saved filters      B  → backlog                                                             │               
                     │                         e  → epics                                                               │               

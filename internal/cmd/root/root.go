@@ -17,7 +17,6 @@ import (
 	"github.com/aakara-dev/jt/internal/cmd/alias"
 	"github.com/aakara-dev/jt/internal/cmd/board"
 	"github.com/aakara-dev/jt/internal/cmd/completion"
-	"github.com/aakara-dev/jt/internal/cmd/ctx"
 	"github.com/aakara-dev/jt/internal/cmd/epic"
 	initCmd "github.com/aakara-dev/jt/internal/cmd/init"
 	"github.com/aakara-dev/jt/internal/cmd/issue"
@@ -44,7 +43,7 @@ var issueKeyArg = regexp.MustCompile(`^[A-Za-z][A-Za-z0-9_]+-\d+$`)
 
 var (
 	config      string
-	contextName string
+	projectFlag string
 	debug       bool
 )
 
@@ -79,11 +78,7 @@ func init() {
 			fmt.Printf("Using config file: %s\n", viper.ConfigFileUsed())
 		}
 
-		override := contextName
-		if override == "" {
-			override = env.Get("CONTEXT")
-		}
-		if err := jiraConfig.ApplyContext(viper.GetViper(), jiraConfig.ActiveContext(viper.GetViper(), override)); err != nil {
+		if err := applyProject(); err != nil {
 			cmdutil.Failed("Error: %s", err)
 		}
 	})
@@ -116,7 +111,7 @@ func NewCmdRoot() *cobra.Command {
 		},
 		PersistentPreRun: func(cmd *cobra.Command, _ []string) {
 			subCmd := cmd.Name()
-			if !cmdRequireToken(subCmd) || cmd.Annotations[ctx.SkipTokenAnnotation] == "true" {
+			if !cmdRequireToken(subCmd) || cmd.Annotations[cmdutil.SkipTokenAnnotation] == "true" {
 				return
 			}
 			requireSetup()
@@ -132,22 +127,15 @@ func NewCmdRoot() *cobra.Command {
 		&config, "config", "c", "",
 		fmt.Sprintf("Config file (default is %s/%s/%s.yml, can be overridden with JT_CONFIG_FILE env var)", configHome, jiraConfig.Dir, jiraConfig.FileName),
 	)
-	cmd.PersistentFlags().StringP(
-		"project", "p", "",
-		fmt.Sprintf(
-			"Jira project to look into (defaults to %s/%s/%s.yml)",
-			configHome, jiraConfig.Dir, jiraConfig.FileName,
-		),
-	)
-	cmd.PersistentFlags().StringVar(
-		&contextName, "context", "",
-		"Context to use for this command instead of the current one (or set JT_CONTEXT)",
+	cmd.PersistentFlags().StringVarP(
+		&projectFlag, "project", "p", "",
+		"Saved project name or Jira project key to use instead of the current project (or set JT_PROJECT)",
 	)
 	cmd.PersistentFlags().BoolVar(&debug, "debug", false, "Turn on debug output")
 
 	cmd.SetHelpFunc(helpFunc)
 
-	_ = cmd.RegisterFlagCompletionFunc("context", ctx.CompleteContexts)
+	_ = cmd.RegisterFlagCompletionFunc("project", project.CompleteProjects)
 
 	_ = viper.BindPFlag("config", cmd.PersistentFlags().Lookup("config"))
 	_ = viper.BindPFlag("project.key", cmd.PersistentFlags().Lookup("project"))
@@ -161,7 +149,6 @@ func NewCmdRoot() *cobra.Command {
 func addChildCommands(cmd *cobra.Command) {
 	cmd.AddCommand(
 		initCmd.NewCmdInit(),
-		ctx.NewCmdCtx(),
 		alias.NewCmdAlias(),
 		ui.NewCmdUI(),
 		issue.NewCmdIssue(),
@@ -177,6 +164,35 @@ func addChildCommands(cmd *cobra.Command) {
 		release.NewCmdRelease(),
 		man.NewCmdMan(),
 	)
+}
+
+// applyProject overlays the selected saved project onto the config. The
+// selector is -p/--project or JT_PROJECT; it may name a saved project or a
+// Jira key. A key that matches no saved project is used as-is with the
+// top-level defaults, like upstream jira-cli.
+func applyProject() error {
+	selector := projectFlag
+	if selector == "" {
+		selector = env.Get("PROJECT")
+	}
+	f, err := jiraConfig.LoadFile(viper.ConfigFileUsed())
+	if err != nil {
+		return nil //nolint:nilerr // no readable config: nothing to overlay
+	}
+	if selector == "" {
+		return jiraConfig.ApplyProject(viper.GetViper(), f.GetString(jiraConfig.KeyCurrentProject))
+	}
+	name := f.Resolve(selector)
+	if name == "" {
+		viper.Set("project.key", selector)
+		return nil
+	}
+	if err := jiraConfig.ApplyProject(viper.GetViper(), name); err != nil {
+		return err
+	}
+	// The flag is bound to project.key; replace the saved name with its key.
+	viper.Set("project.key", f.GetString(jiraConfig.KeyProjects, name, "project", "key"))
+	return nil
 }
 
 // requireSetup exits with guidance if there is no config file or API token.

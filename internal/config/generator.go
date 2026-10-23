@@ -783,9 +783,9 @@ func (c *JiraCLIConfigGenerator) write(path string) (string, error) {
 		config.Set("board", "")
 	}
 
-	ctxName := DefaultContextName(c.value.project.Key)
-	config.Set(KeyCurrentContext, ctxName)
-	config.Set(KeyContexts, map[string]any{ctxName: c.contextValue()})
+	ctxName := DefaultProjectName(c.value.project.Key)
+	config.Set(KeyCurrentProject, ctxName)
+	config.Set(KeyProjects, map[string]any{ctxName: c.projectValue()})
 
 	if err := config.WriteConfig(); err != nil {
 		return "", err
@@ -881,8 +881,8 @@ func create(file string) error {
 	return err
 }
 
-// contextValue is what a context stores: the project-scoped part of the config.
-func (c *JiraCLIConfigGenerator) contextValue() map[string]any {
+// projectValue is what a context stores: the project-scoped part of the config.
+func (c *JiraCLIConfigGenerator) projectValue() map[string]any {
 	val := map[string]any{
 		"project": c.value.project,
 		"issue":   map[string]any{"types": c.value.issueTypes},
@@ -895,10 +895,10 @@ func (c *JiraCLIConfigGenerator) contextValue() map[string]any {
 	return val
 }
 
-// GenerateContext resolves a project (and optionally a board) against the
+// GenerateProject resolves a project (and optionally a board) against the
 // server and returns the value to store under contexts.<name>. Empty project
 // or board values are asked for interactively, reusing the init pickers.
-func GenerateContext(client *jira.Client, project, board string) (map[string]any, error) {
+func GenerateProject(client *jira.Client, project, board string) (map[string]any, error) {
 	c := NewJiraCLIConfigGenerator(&JiraCLIConfig{Project: project, Board: board})
 	c.jiraClient = client
 	c.value.installation = viper.GetString("installation")
@@ -921,5 +921,5 @@ func GenerateContext(client *jira.Client, project, board string) (map[string]any
 	if err != nil {
 		return nil, err
 	}
-	return c.contextValue(), nil
+	return c.projectValue(), nil
 }
