@@ -51,3 +51,13 @@ func Run(args []string) error {
 	}
 	return nil
 }
+
+// RunSearch launches the TUI with the floating search open on input.
+func RunSearch(input string) error {
+	opts := tui.Options{Start: viper.GetString("tui.start")}.WithSearch(input)
+	client := api.DefaultClient(viper.GetBool("debug"))
+	if err := tui.Run(tui.NewJiraBackend(client), opts); err != nil {
+		return fmt.Errorf("ui: %w", err)
+	}
+	return nil
+}

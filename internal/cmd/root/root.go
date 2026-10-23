@@ -18,6 +18,7 @@ import (
 	"github.com/aakara-dev/jt/internal/cmd/board"
 	"github.com/aakara-dev/jt/internal/cmd/completion"
 	"github.com/aakara-dev/jt/internal/cmd/epic"
+	"github.com/aakara-dev/jt/internal/cmd/find"
 	initCmd "github.com/aakara-dev/jt/internal/cmd/init"
 	"github.com/aakara-dev/jt/internal/cmd/issue"
 	"github.com/aakara-dev/jt/internal/cmd/man"
@@ -151,6 +152,7 @@ func addChildCommands(cmd *cobra.Command) {
 		initCmd.NewCmdInit(),
 		alias.NewCmdAlias(),
 		ui.NewCmdUI(),
+		find.NewCmdFind(),
 		issue.NewCmdIssue(),
 		epic.NewCmdEpic(),
 		sprint.NewCmdSprint(),
