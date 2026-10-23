@@ -7,36 +7,36 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	"github.com/ankitpokhrel/jira-cli/api"
-	"github.com/ankitpokhrel/jira-cli/internal/cmdcommon"
-	"github.com/ankitpokhrel/jira-cli/internal/cmdutil"
-	"github.com/ankitpokhrel/jira-cli/internal/query"
-	"github.com/ankitpokhrel/jira-cli/pkg/jira"
-	"github.com/ankitpokhrel/jira-cli/pkg/surveyext"
+	"github.com/aakara-dev/jt/api"
+	"github.com/aakara-dev/jt/internal/cmdcommon"
+	"github.com/aakara-dev/jt/internal/cmdutil"
+	"github.com/aakara-dev/jt/internal/query"
+	"github.com/aakara-dev/jt/pkg/jira"
+	"github.com/aakara-dev/jt/pkg/surveyext"
 )
 
 const (
 	helpText = `Add adds comment to an issue.`
-	examples = `$ jira issue comment add
+	examples = `$ jt issue comment add
 
 # Pass required parameters to skip prompt 
-$ jira issue comment add ISSUE-1 "My comment"
+$ jt issue comment add ISSUE-1 "My comment"
 
 # Multi-line comment
-$ jira issue comment add ISSUE-1 $'Supports\n\nNew line'
+$ jt issue comment add ISSUE-1 $'Supports\n\nNew line'
 
 # Load comment body from a template file
-$ jira issue comment add ISSUE-1 --template /path/to/template.tmpl
+$ jt issue comment add ISSUE-1 --template /path/to/template.tmpl
 
 # Get comment body from standard input
-$ jira issue comment add ISSUE-1 --template -
+$ jt issue comment add ISSUE-1 --template -
 
 # Or, use pipe to read input directly from standard input
-$ echo "Comment from stdin" | jira issue comment add ISSUE-1
+$ echo "Comment from stdin" | jt issue comment add ISSUE-1
 
 # Positional argument takes precedence over the template flag
 # The example below will add "comment from arg" as a comment
-$ jira issue comment add ISSUE-1 "comment from arg" --template /path/to/template.tmpl`
+$ jt issue comment add ISSUE-1 "comment from arg" --template /path/to/template.tmpl`
 )
 
 // NewCmdCommentAdd is a comment add command.

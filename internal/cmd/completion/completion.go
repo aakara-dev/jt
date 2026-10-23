@@ -12,13 +12,13 @@ To load completions:
 
 Bash:
 
-  $ source <(jira completion bash)
+  $ source <(jt completion bash)
 
   # To load completions for each session, execute once:
   Linux:
-    $ jira completion bash > /etc/bash_completion.d/jira
+    $ jt completion bash > /etc/bash_completion.d/jt
   macOS:
-    $ jira completion bash > /usr/local/etc/bash_completion.d/jira
+    $ jt completion bash > /usr/local/etc/bash_completion.d/jt
 
 Zsh:
 
@@ -28,23 +28,23 @@ Zsh:
   $ echo "autoload -U compinit; compinit" >> ~/.zshrc
 
   # To load completions for each session, execute once:
-  $ jira completion zsh > "${fpath[1]}/_jira"
+  $ jt completion zsh > "${fpath[1]}/_jt"
 
   # You will need to start a new shell for this setup to take effect.
 
 Fish:
 
-  $ jira completion fish | source
+  $ jt completion fish | source
 
   # To load completions for each session, execute once:
-  $ jira completion fish > ~/.config/fish/completions/jira.fish
+  $ jt completion fish > ~/.config/fish/completions/jt.fish
 
 PowerShell:
 
-  PS> jira completion powershell | Out-String | Invoke-Expression
+  PS> jt completion powershell | Out-String | Invoke-Expression
 
   # To load completions for every new session, run:
-  PS> jira completion powershell > _jira.ps1
+  PS> jt completion powershell > _jt.ps1
   # and source this file from your PowerShell profile.
 `
 

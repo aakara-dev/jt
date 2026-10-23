@@ -5,15 +5,15 @@ import (
 	"strconv"
 
 	"github.com/AlecAivazis/survey/v2"
-	"github.com/ankitpokhrel/jira-cli/api"
-	"github.com/ankitpokhrel/jira-cli/internal/cmdutil"
-	"github.com/ankitpokhrel/jira-cli/internal/query"
+	"github.com/aakara-dev/jt/api"
+	"github.com/aakara-dev/jt/internal/cmdutil"
+	"github.com/aakara-dev/jt/internal/query"
 	"github.com/spf13/cobra"
 )
 
 const (
 	helpText = `Close sprint.`
-	examples = `$ jira sprint close SPRINT_ID`
+	examples = `$ jt sprint close SPRINT_ID`
 )
 
 // NewCmdClose is an add command.

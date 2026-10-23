@@ -1,6 +1,6 @@
 # Usage:
-#   $ docker build -t jira-cli:latest .
-#   $ docker run --rm -it -v ~/.netrc:/root/.netrc -v ~/.config/.jira:/root/.config/.jira jira-cli
+#   $ docker build -t jt:latest .
+#   $ docker run --rm -it -v ~/.netrc:/root/.netrc -v ~/.config/jt:/root/.config/jt jt
 
 FROM golang:1.26-alpine3.24 AS builder
 
@@ -23,6 +23,6 @@ RUN apk --no-cache add ca-certificates
 
 WORKDIR /root/
 
-COPY --from=builder /go/bin/jira /bin/jira
+COPY --from=builder /go/bin/jt /bin/jt
 
-ENTRYPOINT ["/bin/sh"]
+ENTRYPOINT ["/bin/jt"]

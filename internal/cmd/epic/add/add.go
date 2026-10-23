@@ -8,15 +8,15 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	"github.com/ankitpokhrel/jira-cli/api"
-	"github.com/ankitpokhrel/jira-cli/internal/cmdutil"
-	"github.com/ankitpokhrel/jira-cli/internal/query"
-	"github.com/ankitpokhrel/jira-cli/pkg/jira"
+	"github.com/aakara-dev/jt/api"
+	"github.com/aakara-dev/jt/internal/cmdutil"
+	"github.com/aakara-dev/jt/internal/query"
+	"github.com/aakara-dev/jt/pkg/jira"
 )
 
 const (
 	helpText = `Add issues to an epic.`
-	examples = `$ jira epic add EPIC-KEY ISSUE-1 ISSUE-2`
+	examples = `$ jt epic add EPIC-KEY ISSUE-1 ISSUE-2`
 )
 
 // NewCmdAdd is an add command.

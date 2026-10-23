@@ -5,28 +5,28 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	"github.com/ankitpokhrel/jira-cli/api"
-	"github.com/ankitpokhrel/jira-cli/internal/cmdcommon"
-	"github.com/ankitpokhrel/jira-cli/internal/cmdutil"
-	"github.com/ankitpokhrel/jira-cli/internal/query"
-	"github.com/ankitpokhrel/jira-cli/pkg/jira"
-	"github.com/ankitpokhrel/jira-cli/pkg/surveyext"
-	"github.com/ankitpokhrel/jira-cli/pkg/tui"
+	"github.com/aakara-dev/jt/api"
+	"github.com/aakara-dev/jt/internal/cmdcommon"
+	"github.com/aakara-dev/jt/internal/cmdutil"
+	"github.com/aakara-dev/jt/internal/query"
+	"github.com/aakara-dev/jt/pkg/jira"
+	"github.com/aakara-dev/jt/pkg/surveyext"
+	"github.com/aakara-dev/jt/pkg/tui"
 )
 
 const (
 	helpText = `Create an epic in a given project with minimal information.`
-	examples = `$ jira epic create
+	examples = `$ jt epic create
 
 # Create epic in the configured project
-$ jira epic create -n"Epic epic" -s"Everything" -yHigh -lbug -lurgent -b"Bug description"
+$ jt epic create -n"Epic epic" -s"Everything" -yHigh -lbug -lurgent -b"Bug description"
 
 # Create epic in another project
-$ jira epic create -pPRJ -n"Amazing epic" -yHigh -s"New Bug" -b$'Bug description\n\nSome more text'
+$ jt epic create -pPRJ -n"Amazing epic" -yHigh -s"New Bug" -b$'Bug description\n\nSome more text'
 
 # Create epic and set custom fields
-# See https://github.com/ankitpokhrel/jira-cli/discussions/346
-$ jira epic create -n"Epic with custom fields" --custom story-points=3`
+# See https://github.com/aakara-dev/jt/discussions/346
+$ jt epic create -n"Epic with custom fields" --custom story-points=3`
 )
 
 // NewCmdCreate is a create command.

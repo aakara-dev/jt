@@ -6,14 +6,14 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	"github.com/ankitpokhrel/jira-cli/internal/cmdutil"
-	"github.com/ankitpokhrel/jira-cli/pkg/browser"
+	"github.com/aakara-dev/jt/internal/cmdutil"
+	"github.com/aakara-dev/jt/pkg/browser"
 )
 
 const (
 	helpText = `Open opens issue in a browser. If the issue key is not given, it will open the project page.`
-	examples = `$ jira open
-$ jira open ISSUE-1`
+	examples = `$ jt open
+$ jt open ISSUE-1`
 )
 
 // NewCmdOpen is an open command.

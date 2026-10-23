@@ -6,12 +6,19 @@ import (
 	"github.com/spf13/viper"
 	"github.com/zalando/go-keyring"
 
-	"github.com/ankitpokhrel/jira-cli/pkg/jira"
-	"github.com/ankitpokhrel/jira-cli/pkg/jira/filter"
-	"github.com/ankitpokhrel/jira-cli/pkg/netrc"
+	"github.com/aakara-dev/jt/pkg/env"
+	"github.com/aakara-dev/jt/pkg/jira"
+	"github.com/aakara-dev/jt/pkg/jira/filter"
+	"github.com/aakara-dev/jt/pkg/netrc"
 )
 
-const clientTimeout = 15 * time.Second
+const (
+	clientTimeout = 15 * time.Second
+
+	// KeyringService is the OS keyring service name the API token is stored under.
+	KeyringService       = "jt"
+	legacyKeyringService = "jira-cli"
+)
 
 var jiraClient *jira.Client
 
@@ -70,8 +77,14 @@ func GetAPIToken(config jira.Config) string {
 		return netrcConfig.Password
 	}
 
-	if secret, _ := keyring.Get("jira-cli", config.Login); secret != "" {
-		return secret
+	if token := env.Get("API_TOKEN"); token != "" {
+		return token
+	}
+
+	for _, service := range []string{KeyringService, legacyKeyringService} {
+		if secret, _ := keyring.Get(service, config.Login); secret != "" {
+			return secret
+		}
 	}
 
 	return ""

@@ -8,14 +8,14 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	"github.com/ankitpokhrel/jira-cli/api"
-	"github.com/ankitpokhrel/jira-cli/internal/cmdutil"
-	"github.com/ankitpokhrel/jira-cli/internal/query"
+	"github.com/aakara-dev/jt/api"
+	"github.com/aakara-dev/jt/internal/cmdutil"
+	"github.com/aakara-dev/jt/internal/query"
 )
 
 const (
 	helpText = `Add issues to sprint.`
-	examples = `$ jira sprint add SPRINT_ID ISSUE-1 ISSUE-2`
+	examples = `$ jt sprint add SPRINT_ID ISSUE-1 ISSUE-2`
 )
 
 // NewCmdAdd is an add command.

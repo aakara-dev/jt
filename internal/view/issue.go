@@ -10,11 +10,11 @@ import (
 	"github.com/charmbracelet/glamour"
 	"github.com/fatih/color"
 
-	"github.com/ankitpokhrel/jira-cli/internal/cmdutil"
-	"github.com/ankitpokhrel/jira-cli/pkg/adf"
-	"github.com/ankitpokhrel/jira-cli/pkg/jira"
-	"github.com/ankitpokhrel/jira-cli/pkg/md"
-	"github.com/ankitpokhrel/jira-cli/pkg/tui"
+	"github.com/aakara-dev/jt/internal/cmdutil"
+	"github.com/aakara-dev/jt/pkg/adf"
+	"github.com/aakara-dev/jt/pkg/jira"
+	"github.com/aakara-dev/jt/pkg/md"
+	"github.com/aakara-dev/jt/pkg/tui"
 )
 
 const defaultSummaryLength = 73 // +1 to take ellipsis '…' into account.
@@ -421,7 +421,7 @@ func (i Issue) footer() string {
 		if i.Display.Plain {
 			out.WriteString("\n")
 		}
-		fmt.Fprintf(&out, "%s\n", gray("Use --comments <limit> with `jira issue view` to load more comments"))
+		fmt.Fprintf(&out, "%s\n", gray("Use --comments <limit> with `jt issue view` to load more comments"))
 	}
 	if i.Display.Plain {
 		out.WriteString("\n")

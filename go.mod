@@ -1,4 +1,4 @@
-module github.com/ankitpokhrel/jira-cli
+module github.com/aakara-dev/jt
 
 go 1.26.0
 

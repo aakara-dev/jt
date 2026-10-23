@@ -8,11 +8,11 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	"github.com/ankitpokhrel/jira-cli/api"
-	"github.com/ankitpokhrel/jira-cli/internal/cmdutil"
-	"github.com/ankitpokhrel/jira-cli/internal/query"
-	"github.com/ankitpokhrel/jira-cli/internal/view"
-	"github.com/ankitpokhrel/jira-cli/pkg/jira"
+	"github.com/aakara-dev/jt/api"
+	"github.com/aakara-dev/jt/internal/cmdutil"
+	"github.com/aakara-dev/jt/internal/query"
+	"github.com/aakara-dev/jt/internal/view"
+	"github.com/aakara-dev/jt/pkg/jira"
 )
 
 const (
@@ -21,7 +21,7 @@ const (
 You can combine different flags to create a unique query. For instance,
 	
 # Issues that are of high priority, is in progress, was created this month, and has given labels
-$ jira issue list -yHigh -s"In Progress" --created month -lbackend -l"high prio"
+$ jt issue list -yHigh -s"In Progress" --created month -lbackend -l"high prio"
 
 You can also add an optional search query as a positional argument, which functions the same
 as entering a search query into the Jira UI's search box.
@@ -30,40 +30,40 @@ Issues are displayed in an interactive list view by default. You can use a --pla
 to display output in a plain text mode. A --no-headers flag will hide the table headers
 in plain view. A --no-truncate flag will display all available fields in plain mode.`
 
-	examples = `$ jira issue list
+	examples = `$ jt issue list
 
 # Limit list to 20 items
-$ jira issue list --paginate 20
+$ jt issue list --paginate 20
 
 # Get 50 items starting from 10
-$ jira issue list --paginate 10:50
+$ jt issue list --paginate 10:50
 
 # Search for issues containing specific text
-$ jira issue list "Feature Request"
+$ jt issue list "Feature Request"
 
 # List issues in a plain table view without headers
-$ jira issue list --plain --no-headers
+$ jt issue list --plain --no-headers
 
 # List some columns of the issue in a plain table view
-$ jira issue list --plain --columns key,assignee,status
+$ jt issue list --plain --columns key,assignee,status
 
 # List issues in a plain table view and show all fields
-$ jira issue list --plain --no-truncate
+$ jt issue list --plain --no-truncate
 
 # List issues in a plain table view using custom delimiter (default is "\t")
-$ jira issue list --plain --delimiter "|"
+$ jt issue list --plain --delimiter "|"
 
 # List issues as raw JSON data
-$ jira issue list --raw
+$ jt issue list --raw
 
 # List issues of type "Epic" in status "Done"
-$ jira issue list -tEpic -sDone
+$ jt issue list -tEpic -sDone
 
 # List issues in status other than "Open" and is assigned to no one
-$ jira issue list -s~Open -ax
+$ jt issue list -s~Open -ax
 
 # List issues from all projects
-$ jira issue list -q"project IS NOT EMPTY"`
+$ jt issue list -q"project IS NOT EMPTY"`
 )
 
 // NewCmdList is a list command.

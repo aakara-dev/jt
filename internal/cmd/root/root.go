@@ -8,27 +8,28 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	"github.com/ankitpokhrel/jira-cli/api"
-	"github.com/ankitpokhrel/jira-cli/internal/cmd/board"
-	"github.com/ankitpokhrel/jira-cli/internal/cmd/completion"
-	"github.com/ankitpokhrel/jira-cli/internal/cmd/epic"
-	initCmd "github.com/ankitpokhrel/jira-cli/internal/cmd/init"
-	"github.com/ankitpokhrel/jira-cli/internal/cmd/issue"
-	"github.com/ankitpokhrel/jira-cli/internal/cmd/man"
-	"github.com/ankitpokhrel/jira-cli/internal/cmd/me"
-	"github.com/ankitpokhrel/jira-cli/internal/cmd/open"
-	"github.com/ankitpokhrel/jira-cli/internal/cmd/project"
-	"github.com/ankitpokhrel/jira-cli/internal/cmd/release"
-	"github.com/ankitpokhrel/jira-cli/internal/cmd/serverinfo"
-	"github.com/ankitpokhrel/jira-cli/internal/cmd/sprint"
-	"github.com/ankitpokhrel/jira-cli/internal/cmd/version"
-	"github.com/ankitpokhrel/jira-cli/internal/cmdutil"
-	jiraConfig "github.com/ankitpokhrel/jira-cli/internal/config"
-	"github.com/ankitpokhrel/jira-cli/pkg/jira"
+	"github.com/aakara-dev/jt/api"
+	"github.com/aakara-dev/jt/internal/cmd/board"
+	"github.com/aakara-dev/jt/internal/cmd/completion"
+	"github.com/aakara-dev/jt/internal/cmd/epic"
+	initCmd "github.com/aakara-dev/jt/internal/cmd/init"
+	"github.com/aakara-dev/jt/internal/cmd/issue"
+	"github.com/aakara-dev/jt/internal/cmd/man"
+	"github.com/aakara-dev/jt/internal/cmd/me"
+	"github.com/aakara-dev/jt/internal/cmd/open"
+	"github.com/aakara-dev/jt/internal/cmd/project"
+	"github.com/aakara-dev/jt/internal/cmd/release"
+	"github.com/aakara-dev/jt/internal/cmd/serverinfo"
+	"github.com/aakara-dev/jt/internal/cmd/sprint"
+	"github.com/aakara-dev/jt/internal/cmd/version"
+	"github.com/aakara-dev/jt/internal/cmdutil"
+	jiraConfig "github.com/aakara-dev/jt/internal/config"
+	"github.com/aakara-dev/jt/pkg/env"
+	"github.com/aakara-dev/jt/pkg/jira"
 )
 
 const (
-	jiraCLIHelpLink  = "https://github.com/ankitpokhrel/jira-cli#getting-started"
+	jiraCLIHelpLink  = "https://github.com/aakara-dev/jt#getting-started"
 	jiraAPITokenLink = "https://id.atlassian.com/manage-profile/security/api-tokens"
 )
 
@@ -42,7 +43,7 @@ func init() {
 		if config != "" {
 			// 1. Command line flag has the highest priority
 			viper.SetConfigFile(config)
-		} else if configFile := os.Getenv("JIRA_CONFIG_FILE"); configFile != "" {
+		} else if configFile := env.Get("CONFIG_FILE"); configFile != "" {
 			// 2. Environment variable has second priority
 			viper.SetConfigFile(configFile)
 		} else {
@@ -59,7 +60,7 @@ func init() {
 		}
 
 		viper.AutomaticEnv()
-		viper.SetEnvPrefix("jira")
+		viper.SetEnvPrefix("jt")
 
 		if err := viper.ReadInConfig(); err == nil && debug {
 			fmt.Printf("Using config file: %s\n", viper.ConfigFileUsed())
@@ -70,7 +71,7 @@ func init() {
 // NewCmdRoot is a root command.
 func NewCmdRoot() *cobra.Command {
 	cmd := cobra.Command{
-		Use:   "jira <command> <subcommand>",
+		Use:   "jt <command> <subcommand>",
 		Short: "Interactive Jira CLI",
 		Long:  "Interactive Jira command line.",
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -89,7 +90,7 @@ func NewCmdRoot() *cobra.Command {
 
 			configFile := viper.ConfigFileUsed()
 			if !jiraConfig.Exists(configFile) {
-				cmdutil.Failed("Missing configuration file.\nRun 'jira init' to configure the tool.")
+				cmdutil.Failed("Missing configuration file.\nRun 'jt init' to configure the tool.")
 			}
 		},
 	}
@@ -101,7 +102,7 @@ func NewCmdRoot() *cobra.Command {
 
 	cmd.PersistentFlags().StringVarP(
 		&config, "config", "c", "",
-		fmt.Sprintf("Config file (default is %s/%s/%s.yml, can be overridden with JIRA_CONFIG_FILE env var)", configHome, jiraConfig.Dir, jiraConfig.FileName),
+		fmt.Sprintf("Config file (default is %s/%s/%s.yml, can be overridden with JT_CONFIG_FILE env var)", configHome, jiraConfig.Dir, jiraConfig.FileName),
 	)
 	cmd.PersistentFlags().StringP(
 		"project", "p", "",
@@ -145,7 +146,7 @@ func cmdRequireToken(cmd string) bool {
 	allowList := []string{
 		"init",
 		"help",
-		"jira",
+		"jt",
 		"version",
 		"completion",
 		"__complete", "__completeNoDesc", // Subcommand name during autocompletion call.
@@ -168,10 +169,10 @@ For cloud server: you can generate the token using this link: %s
 For local server: you can use the password you use to log in to Jira for basic auth or get a token from your Jira profile for PAT.
 
 After generating the token, you can either:
-  - Export API token to your shell as a JIRA_API_TOKEN env variable
+  - Export API token to your shell as a JT_API_TOKEN env variable
   - Or, you can use a .netrc file to define required machine details
 
-Once you are done with the above steps, run 'jira init' to generate the config if you haven't already.
+Once you are done with the above steps, run 'jt init' to generate the config if you haven't already.
 
 For more details, see: %s
 `, jiraAPITokenLink, jiraCLIHelpLink)

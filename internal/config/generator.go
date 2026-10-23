@@ -12,17 +12,17 @@ import (
 	"github.com/AlecAivazis/survey/v2/core"
 	"github.com/spf13/viper"
 
-	"github.com/ankitpokhrel/jira-cli/api"
-	"github.com/ankitpokhrel/jira-cli/internal/cmdutil"
-	"github.com/ankitpokhrel/jira-cli/pkg/jira"
+	"github.com/aakara-dev/jt/api"
+	"github.com/aakara-dev/jt/internal/cmdutil"
+	"github.com/aakara-dev/jt/pkg/jira"
 )
 
 const (
-	// Dir is a jira-cli config directory.
-	Dir = ".jira"
-	// FileName is a jira-cli config file name.
-	FileName = ".config"
-	// FileType is a jira-cli config file extension.
+	// Dir is the jt config directory.
+	Dir = "jt"
+	// FileName is the jt config file name.
+	FileName = "config"
+	// FileType is the jt config file extension.
 	FileType = "yml"
 
 	optionSearch = "[Search...]"

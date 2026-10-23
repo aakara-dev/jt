@@ -7,8 +7,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/ankitpokhrel/jira-cli/pkg/adf"
-	"github.com/ankitpokhrel/jira-cli/pkg/md"
+	"github.com/aakara-dev/jt/pkg/adf"
+	"github.com/aakara-dev/jt/pkg/md"
 )
 
 // CreateResponse struct holds response from POST /issue endpoint.
@@ -51,12 +51,12 @@ type CreateRequest struct {
 	configuredCustomFields []IssueTypeField
 }
 
-// ForProjectType sets jira project type.
+// ForProjectType sets jt project type.
 func (cr *CreateRequest) ForProjectType(pt string) {
 	cr.projectType = pt
 }
 
-// ForInstallationType sets jira project type.
+// ForInstallationType sets jt project type.
 func (cr *CreateRequest) ForInstallationType(it string) {
 	cr.installationType = it
 }

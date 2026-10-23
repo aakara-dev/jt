@@ -7,35 +7,35 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	"github.com/ankitpokhrel/jira-cli/api"
-	"github.com/ankitpokhrel/jira-cli/internal/cmdcommon"
-	"github.com/ankitpokhrel/jira-cli/internal/cmdutil"
-	"github.com/ankitpokhrel/jira-cli/internal/query"
-	"github.com/ankitpokhrel/jira-cli/pkg/jira"
-	"github.com/ankitpokhrel/jira-cli/pkg/surveyext"
+	"github.com/aakara-dev/jt/api"
+	"github.com/aakara-dev/jt/internal/cmdcommon"
+	"github.com/aakara-dev/jt/internal/cmdutil"
+	"github.com/aakara-dev/jt/internal/query"
+	"github.com/aakara-dev/jt/pkg/jira"
+	"github.com/aakara-dev/jt/pkg/surveyext"
 )
 
 const (
 	helpText = `Add adds worklog to an issue.`
-	examples = `$ jira issue worklog add
+	examples = `$ jt issue worklog add
 
 # Pass required parameters and use --no-input to skip prompt
-$ jira issue worklog add ISSUE-1 "2d 1h 30m" --no-input
+$ jt issue worklog add ISSUE-1 "2d 1h 30m" --no-input
 
 # You can add a comment using --comment flag when adding a worklog
-$ jira issue worklog add ISSUE-1 "2d 1h 30m" --comment "This is a comment" --no-input
+$ jt issue worklog add ISSUE-1 "2d 1h 30m" --comment "This is a comment" --no-input
 
 # You can also add a worklog with the specific start date (defaults to UTC timezone)
-$ jira issue worklog add ISSUE-1 "2d 1h 30m" --started "2022-01-01 09:30:00"
+$ jt issue worklog add ISSUE-1 "2d 1h 30m" --started "2022-01-01 09:30:00"
 
 # You can specify timezone to use along with the start date in IANA timezone format
-$ jira issue worklog add ISSUE-1 3h --started "2022-01-01 09:30:00" --timezone "Europe/Berlin"
+$ jt issue worklog add ISSUE-1 3h --started "2022-01-01 09:30:00" --timezone "Europe/Berlin"
 
 # Or, you can use start date in Jira datetime format and skip the timezone flag
-$ jira issue worklog add ISSUE-1 "1h 30m" --started "2022-01-01T09:30:00.000+0200"
+$ jt issue worklog add ISSUE-1 "1h 30m" --started "2022-01-01T09:30:00.000+0200"
 
 # Or, you can update a worklogs remaining estimate
-$ jira issue worklog add ISSUE-1 "1h 30m" --started "2022-01-01T09:30:00.000+0200" --new-estimate 0h`
+$ jt issue worklog add ISSUE-1 "1h 30m" --started "2022-01-01T09:30:00.000+0200" --new-estimate 0h`
 )
 
 // NewCmdWorklogAdd is a worklog add command.
