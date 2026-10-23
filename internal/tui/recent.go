@@ -46,15 +46,7 @@ func (r *recentStore) add(iss *jira.Issue) {
 	if iss == nil {
 		return
 	}
-	slim := &jira.Issue{Key: iss.Key}
-	slim.Fields.Summary = iss.Fields.Summary
-	slim.Fields.Status = iss.Fields.Status
-	slim.Fields.IssueType = iss.Fields.IssueType
-	slim.Fields.Priority = iss.Fields.Priority
-	slim.Fields.Assignee = iss.Fields.Assignee
-	slim.Fields.Updated = iss.Fields.Updated
-
-	out := []*jira.Issue{slim}
+	out := []*jira.Issue{slim(iss)}
 	for _, x := range r.issues {
 		if x.Key != iss.Key && len(out) < recentLimit {
 			out = append(out, x)

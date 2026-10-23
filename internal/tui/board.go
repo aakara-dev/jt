@@ -138,6 +138,7 @@ func (v *boardView) Hints() []Hint {
 		{"j / k", "next / previous card"},
 		{"H / L", "move card left / right (transition)"},
 		{"[ / ]", "previous / next active sprint"},
+		{"S", "sprint stats"},
 		{"enter", "details"},
 		{"ctrl+r", "reload"},
 	}
@@ -254,6 +255,8 @@ func (v *boardView) Update(msg tea.Msg) (View, tea.Cmd) {
 			}
 		case "ctrl+r":
 			return v, v.load(-1)
+		case "S":
+			return v, openPopup(statsPopup{title: v.Title(), columns: v.columns})
 		case "enter":
 			if iss := v.Selected(); iss != nil {
 				return v, push(newDetailView(iss.Key, v.backend, v.st))

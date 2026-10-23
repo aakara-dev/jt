@@ -33,6 +33,7 @@ var leaderMenu = []leaderEntry{
 	{"j", "JQL query", "search >", "Find"},
 	{"f", "saved filters", "search *", "Find"},
 
+	{"h", "my work dashboard", "home", "Lists"},
 	{"b", "board (kanban)", "board", "Lists"},
 	{"i", "issues", "issues", "Lists"},
 	{"m", "assigned to me", "mine", "Lists"},
@@ -73,6 +74,7 @@ var globalHints = []Hint{
 
 // commandHelp documents the ":" commands.
 var commandHelp = []Hint{
+	{":home", "my work dashboard"},
 	{":board", "sprint / kanban board"},
 	{":issues :mine :sprint :backlog", "issue lists"},
 	{":epics :recent :watching :bugs", "more lists"},
@@ -82,6 +84,7 @@ var commandHelp = []Hint{
 	{":save NAME", "save current list's JQL"},
 	{":search [text]", "floating search"},
 	{":theme [name]", "change theme"},
+	{":export [csv|md] [path]", "export the current view"},
 	{":KEY-123", "open an issue"},
 	{":q / :quit", "quit"},
 }

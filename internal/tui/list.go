@@ -49,6 +49,18 @@ type listView struct {
 
 	marked map[string]bool // visual selection by issue key
 	keepAt string          // key to restore the cursor to after a reload
+	cached bool            // showing cached results while refreshing
+
+	progress map[string][2]int // epics: key → {done, total} children
+}
+
+// activeServer scopes the on-disk list cache to the Jira server in use.
+var activeServer string
+
+type epicProgressMsg struct {
+	id          int
+	key         string
+	done, total int
 }
 
 func newListView(spec ListSpec, b Backend, st *styles) *listView {
@@ -58,7 +70,40 @@ func newListView(spec ListSpec, b Backend, st *styles) *listView {
 	return &listView{id: listSeq, spec: spec, backend: b, st: st, filter: in, loading: true, preview: true, marked: map[string]bool{}}
 }
 
-func (v *listView) Init() tea.Cmd { return v.fetch(0) }
+func (v *listView) Init() tea.Cmd {
+	if cached := loadListCache(activeServer, v.spec.JQL); len(cached) > 0 {
+		v.issues, v.total, v.cached = cached, len(cached), true
+		v.applyFilter()
+	}
+	return v.fetch(0)
+}
+
+func (v *listView) isEpics() bool { return v.spec.Name == "epics" }
+
+// fetchProgress counts done/total children for each epic, a few at a time.
+func (v *listView) fetchProgress(epics []*jira.Issue) tea.Cmd {
+	const parallel = 6
+	id, b := v.id, v.backend
+	sem := make(chan struct{}, parallel)
+	cmds := make([]tea.Cmd, 0, len(epics))
+	for _, e := range epics {
+		key := e.Key
+		cmds = append(cmds, func() tea.Msg {
+			sem <- struct{}{}
+			defer func() { <-sem }()
+			all, err := b.Search(fmt.Sprintf(`"Epic Link" = %s`, key), 0, 0)
+			if err != nil {
+				return nil
+			}
+			done, err := b.Search(fmt.Sprintf(`"Epic Link" = %s AND statusCategory = Done`, key), 0, 0)
+			if err != nil {
+				return nil
+			}
+			return epicProgressMsg{id: id, key: key, done: done.Total, total: all.Total}
+		})
+	}
+	return tea.Batch(cmds...)
+}
 
 func (v *listView) fetch(from uint) tea.Cmd {
 	v.loading = true
@@ -91,6 +136,14 @@ func (v *listView) Marked() []*jira.Issue {
 }
 
 func (v *listView) Hints() []Hint {
+	if v.isEpics() {
+		return []Hint{
+			{"enter", "issues in the epic"},
+			{"l", "epic details"},
+			{"/", "filter"},
+			{"ctrl+r", "reload"},
+		}
+	}
 	return []Hint{
 		{"/", "filter"},
 		{"p", "toggle preview"},
@@ -187,10 +240,16 @@ func (v *listView) Update(msg tea.Msg) (View, tea.Cmd) {
 			return v, toastErr(msg.err)
 		}
 		v.err = nil
+		v.cached = false
+		var progress tea.Cmd
 		if msg.from == 0 {
 			v.issues = msg.result.Issues
+			saveListCache(activeServer, v.spec.JQL, v.issues)
 		} else {
 			v.issues = append(v.issues, msg.result.Issues...)
+		}
+		if v.isEpics() {
+			progress = v.fetchProgress(msg.result.Issues)
 		}
 		v.total = max(msg.result.Total, len(v.issues))
 		v.applyFilter()
@@ -201,6 +260,15 @@ func (v *listView) Update(msg tea.Msg) (View, tea.Cmd) {
 				}
 			}
 			v.keepAt = ""
+		}
+		return v, progress
+
+	case epicProgressMsg:
+		if msg.id == v.id {
+			if v.progress == nil {
+				v.progress = map[string][2]int{}
+			}
+			v.progress[msg.key] = [2]int{msg.done, msg.total}
 		}
 		return v, nil
 
@@ -267,9 +335,14 @@ func (v *listView) Update(msg tea.Msg) (View, tea.Cmd) {
 		case "J":
 			return v, v.rank(1)
 		case "enter", "l", "right":
-			if iss := v.Selected(); iss != nil {
-				return v, push(newDetailView(iss.Key, v.backend, v.st))
+			iss := v.Selected()
+			if iss == nil {
+				break
 			}
+			if v.isEpics() && key == "enter" {
+				return v, push(newListView(EpicChildren(iss.Key), v.backend, v.st))
+			}
+			return v, push(newDetailView(iss.Key, v.backend, v.st))
 		}
 	}
 	return v, nil
@@ -356,6 +429,9 @@ func (v *listView) renderHeader(width int) string {
 	if n := len(v.marked); n > 0 {
 		title += " " + st.Accent2.Bold(true).Render(fmt.Sprintf("[%d marked]", n))
 	}
+	if v.cached {
+		title += " " + st.Muted.Render("cached")
+	}
 	if v.loading {
 		title += " " + st.Warn.Render("⟳")
 	}
@@ -396,7 +472,10 @@ func (v *listView) renderRows(width, height int) string {
 			fit(f.Summary, summaryW),
 			fit(st.statusBadge(f.Status), colStatus),
 		}
-		if showAssignee {
+		switch {
+		case v.isEpics():
+			cells = append(cells, fit(v.progressCell(iss.Key), colAssignee))
+		case showAssignee:
 			cells = append(cells, st.Subtle.Render(fit(orDash(f.Assignee.Name), colAssignee)))
 		}
 		cells = append(cells, st.Muted.Render(fit(ago(f.Updated), colUpdated)))
@@ -415,6 +494,16 @@ func (v *listView) renderRows(width, height int) string {
 		rows = append(rows, line)
 	}
 	return strings.Join(rows, "\n")
+}
+
+// progressCell renders an epic's child completion as a small bar.
+func (v *listView) progressCell(key string) string {
+	st := *v.st
+	p, ok := v.progress[key]
+	if !ok {
+		return st.Muted.Render("…")
+	}
+	return progressBar(st, p[0], p[1], 8) + st.Muted.Render(fmt.Sprintf(" %d/%d", p[0], p[1]))
 }
 
 // renderPreview shows the key facts of an issue next to the list.

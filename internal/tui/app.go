@@ -16,7 +16,7 @@ import (
 const toastTTL = 3 * time.Second
 
 // cycleViews are the lists <tab> rotates through.
-var cycleViews = []string{"issues", "board", "mine", "sprint", "backlog", "recent"}
+var cycleViews = []string{"home", "issues", "board", "sprint", "backlog", "recent"}
 
 // App is the root Bubble Tea model: a stack of views, an optional floating
 // popup, and a status bar.
@@ -42,6 +42,9 @@ type App struct {
 	searchInput string
 
 	pending pendingEdit // description being edited in $EDITOR
+
+	watchSeen   map[string]string // issue key → last seen "updated"
+	watchPrimed bool
 }
 
 // Options configure how the TUI starts.
@@ -62,12 +65,24 @@ func (o Options) WithSearch(input string) Options {
 // NewApp builds the root model.
 func NewApp(sess Session, b Backend, opts Options) *App {
 	st := newStyles(sess.Theme)
-	a := &App{sess: sess, backend: b, st: &st, recent: loadRecent(), startSearch: opts.openSearch, searchInput: opts.Search}
+	activeServer = sess.Server
+	a := &App{
+		sess: sess, backend: b, st: &st, recent: loadRecent(),
+		startSearch: opts.openSearch, searchInput: opts.Search,
+		watchSeen: map[string]string{},
+	}
 	start := opts.Start
 	if start == "" {
-		start = a.defaultList()
+		start = defaultStart
 	}
-	if spec, ok := BuiltinList(start, sess); ok {
+	for i, name := range cycleViews {
+		if name == start {
+			a.cycle = i
+		}
+	}
+	if start == "home" {
+		a.stack = []View{newHomeView(sess, b, a.st)}
+	} else if spec, ok := BuiltinList(start, sess); ok {
 		a.stack = []View{newListView(spec, b, a.st)}
 	} else if issueKeyRe.MatchString(start) {
 		a.stack = []View{newDetailView(strings.ToUpper(start), b, a.st)}
@@ -85,14 +100,22 @@ func (a *App) defaultList() string {
 	return "issues"
 }
 
+// defaultStart is the view jt opens on: the dashboard, unless tui.start says
+// otherwise.
+const defaultStart = "home"
+
 func (a *App) top() View { return a.stack[len(a.stack)-1] }
 
 // Init starts the first view.
 func (a *App) Init() tea.Cmd {
+	cmds := []tea.Cmd{a.top().Init()}
 	if a.startSearch {
-		return tea.Batch(a.top().Init(), a.openSearch(a.searchInput))
+		cmds = append(cmds, a.openSearch(a.searchInput))
 	}
-	return a.top().Init()
+	if a.sess.WatchInterval > 0 {
+		cmds = append(cmds, a.pollWatched()) // primes the baseline
+	}
+	return tea.Batch(cmds...)
 }
 
 // Update routes messages to the popup, global key handlers and views.
@@ -137,6 +160,7 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case sessionChangedMsg:
 		a.sess = msg.s
+		activeServer = a.sess.Server
 		spec, _ := BuiltinList(a.defaultList(), a.sess)
 		v := newListView(spec, a.backend, a.st)
 		a.stack = []View{v}
@@ -145,6 +169,11 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case viewedIssueMsg:
 		a.recent.add(msg.iss)
 		return a, nil
+
+	case watchTickMsg:
+		return a, a.pollWatched()
+	case watchResultMsg:
+		return a, a.onWatchResult(msg)
 
 	case pendingEditMsg:
 		a.pending = msg.p
@@ -291,6 +320,11 @@ func (a *App) exec(line string) tea.Cmd {
 			return a.themePicker()
 		}
 		return a.setTheme(arg)
+	case "export", "x":
+		return a.exportView(arg)
+	case "home", "dash", "dashboard", "work":
+		v := newHomeView(a.sess, a.backend, a.st)
+		return func() tea.Msg { return replaceViewMsg{v} }
 	case "board", "kanban", "b":
 		if a.sess.BoardID == 0 {
 			return toast("no board for " + a.sess.Project + ": save one with `jt project add NAME KEY --board ...`")
@@ -401,7 +435,7 @@ func (a *App) setTheme(name string) tea.Cmd {
 
 // completions feeds the ":" prompt.
 func (a *App) completions(input string) []string {
-	cands := []string{"project", "board", "theme", "search", "query", "save", "epic", "open", "help", "quit", "project -"}
+	cands := []string{"home", "export csv", "export md", "project", "board", "theme", "search", "query", "save", "epic", "open", "help", "quit", "project -"}
 	cands = append(cands, BuiltinListNames...)
 	for _, c := range a.sess.Projects {
 		cands = append(cands, "project "+c.Name)

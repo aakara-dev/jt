@@ -4,6 +4,7 @@ package tui
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/spf13/viper"
 
@@ -22,7 +23,15 @@ type Session struct {
 	Projects []jtConfig.SavedProject
 	Queries  map[string]string // saved_queries from config
 	Theme    string
+
+	// WatchInterval polls watched/assigned issues for changes (0 disables).
+	WatchInterval time.Duration
+	// Bell rings the terminal bell on watch notifications.
+	Bell bool
 }
+
+// defaultWatchInterval applies when tui.watch_interval is not configured.
+const defaultWatchInterval = 5 * time.Minute
 
 // LoadSession snapshots the current viper state (after the project overlay).
 func LoadSession() Session {
@@ -35,6 +44,11 @@ func LoadSession() Session {
 		Queries: viper.GetStringMapString(jtConfig.KeySavedQueries),
 		Theme:   viper.GetString("theme"),
 	}
+	s.WatchInterval = defaultWatchInterval
+	if viper.IsSet("tui.watch_interval") {
+		s.WatchInterval = viper.GetDuration("tui.watch_interval")
+	}
+	s.Bell = viper.GetBool("tui.bell")
 	if f, err := jtConfig.LoadCurrent(); err == nil {
 		s.Projects = f.Projects()
 	}

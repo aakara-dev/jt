@@ -30,6 +30,7 @@ type fakeBackend struct {
 	writeErr error
 	board    *jira.BoardConfig
 	sprints  []*jira.Sprint
+	totals   map[string]int // JQL → total, for count-only queries
 }
 
 func (f *fakeBackend) record(format string, a ...any) error {
@@ -130,6 +131,9 @@ func (f *fakeBackend) Search(jql string, from, limit uint) (*jira.SearchResult, 
 	if f.err != nil {
 		return nil, f.err
 	}
+	if t, ok := f.totals[jql]; ok {
+		return &jira.SearchResult{Total: t}, nil
+	}
 	end := min(int(from+limit), len(f.issues))
 	return &jira.SearchResult{StartAt: int(from), Total: len(f.issues), Issues: f.issues[from:end]}, nil
 }
@@ -205,6 +209,9 @@ type harness struct {
 func newHarness(t *testing.T, b Backend, opts Options) *harness {
 	t.Helper()
 	t.Setenv("XDG_CACHE_HOME", t.TempDir())
+	if opts.Start == "" {
+		opts.Start = "issues"
+	}
 	h := &harness{t: t, app: NewApp(testSession(), b, opts)}
 	h.send(tea.WindowSizeMsg{Width: 140, Height: 40})
 	h.run(h.app.Init(), 0)
@@ -512,10 +519,10 @@ func TestHelpPopup(t *testing.T) {
 func TestTabCyclesLists(t *testing.T) {
 	b := &fakeBackend{issues: sampleIssues(1)}
 	h := newHarness(t, b, Options{})
-	h.send(key("tab"))
-	assert.Contains(t, b.lastQuery(), "assignee = currentUser()")
-	h.send(key("tab"))
+	h.send(key("tab")) // issues → (board skipped: no board) → sprint
 	assert.Contains(t, b.lastQuery(), "openSprints()")
+	h.send(key("tab"))
+	assert.Contains(t, b.lastQuery(), "sprint is EMPTY")
 }
 
 func TestQuitFromRoot(t *testing.T) {
