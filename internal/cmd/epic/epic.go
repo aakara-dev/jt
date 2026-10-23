@@ -17,7 +17,7 @@ func NewCmdEpic() *cobra.Command {
 		Use:         "epic",
 		Short:       "Epic manage epics in a project",
 		Long:        helpText,
-		Aliases:     []string{"epics"},
+		Aliases:     []string{"epics", "ep"},
 		Annotations: map[string]string{"cmd:main": "true"},
 		RunE:        epic,
 	}

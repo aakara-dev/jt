@@ -14,7 +14,7 @@ func NewCmdWorklog() *cobra.Command {
 		Use:     "worklog",
 		Short:   "Manage issue worklog",
 		Long:    helpText,
-		Aliases: []string{"wlg"},
+		Aliases: []string{"wlg", "wl", "log"},
 		RunE:    comment,
 	}
 

@@ -3,15 +3,14 @@ package ctx
 import (
 	"fmt"
 	"io"
-	"text/tabwriter"
 
-	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
 	"github.com/aakara-dev/jt/api"
 	"github.com/aakara-dev/jt/internal/cmdutil"
 	jtConfig "github.com/aakara-dev/jt/internal/config"
+	"github.com/aakara-dev/jt/internal/theme"
 )
 
 // SkipTokenAnnotation marks commands that work without a Jira API token.
@@ -98,7 +97,7 @@ func newCmdCurrent() *cobra.Command {
 		Annotations: map[string]string{SkipTokenAnnotation: "true"},
 		Args:        cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, _ []string) error {
-			f, err := loadFile()
+			f, err := jtConfig.LoadCurrent()
 			if err != nil {
 				return err
 			}
@@ -128,7 +127,7 @@ func newCmdAdd() *cobra.Command {
 			force, _ := cmd.Flags().GetBool("force")
 			noSwitch, _ := cmd.Flags().GetBool("no-switch")
 
-			f, err := loadFile()
+			f, err := jtConfig.LoadCurrent()
 			if err != nil {
 				return err
 			}
@@ -175,7 +174,7 @@ func newCmdRemove() *cobra.Command {
 		Args:              cobra.ExactArgs(1),
 		ValidArgsFunction: CompleteContexts,
 		RunE: func(_ *cobra.Command, args []string) error {
-			f, err := loadFile()
+			f, err := jtConfig.LoadCurrent()
 			if err != nil {
 				return err
 			}
@@ -200,7 +199,7 @@ func newCmdRename() *cobra.Command {
 		Args:              cobra.ExactArgs(2),
 		ValidArgsFunction: CompleteContexts,
 		RunE: func(_ *cobra.Command, args []string) error {
-			f, err := loadFile()
+			f, err := jtConfig.LoadCurrent()
 			if err != nil {
 				return err
 			}
@@ -217,7 +216,7 @@ func newCmdRename() *cobra.Command {
 }
 
 func list(w io.Writer) error {
-	f, err := loadFile()
+	f, err := jtConfig.LoadCurrent()
 	if err != nil {
 		return err
 	}
@@ -227,28 +226,26 @@ func list(w io.Writer) error {
 		return nil
 	}
 
-	cur := color.New(color.FgGreen, color.Bold)
-	dim := color.New(color.Faint)
-	tw := tabwriter.NewWriter(w, 0, 4, 2, ' ', 0)
-	_, _ = fmt.Fprintln(tw, dim.Sprint("CURRENT\tNAME\tPROJECT\tBOARD"))
-	for _, c := range ctxs {
+	rows := make([][]string, 0, len(ctxs))
+	current := -1
+	for i, c := range ctxs {
 		board := c.Board
 		if board == "" {
 			board = "-"
 		} else if c.BoardID != "" {
 			board = fmt.Sprintf("%s (#%s)", board, c.BoardID)
 		}
+		marker := " "
 		if c.Current {
-			_, _ = fmt.Fprintln(tw, cur.Sprintf("*\t%s\t%s\t%s", c.Name, c.Project, board))
-			continue
+			marker, current = "*", i
 		}
-		_, _ = fmt.Fprintf(tw, " \t%s\t%s\t%s\n", c.Name, c.Project, board)
+		rows = append(rows, []string{marker, c.Name, c.Project, board})
 	}
-	return tw.Flush()
+	return theme.Table(w, theme.Active(), []string{"", "NAME", "PROJECT", "BOARD"}, rows, current)
 }
 
 func use(w io.Writer, name string) error {
-	f, err := loadFile()
+	f, err := jtConfig.LoadCurrent()
 	if err != nil {
 		return err
 	}
@@ -259,24 +256,14 @@ func use(w io.Writer, name string) error {
 	if err := f.Save(); err != nil {
 		return err
 	}
-	_, err = fmt.Fprintf(w, "Switched to context %s\n", color.New(color.FgGreen, color.Bold).Sprint(name))
-	return err
-}
-
-func loadFile() (*jtConfig.File, error) {
-	path := viper.ConfigFileUsed()
-	if path == "" {
-		var err error
-		if path, err = jtConfig.Path(""); err != nil {
-			return nil, err
-		}
-	}
-	return jtConfig.LoadFile(path)
+	st := theme.Active()
+	theme.Fprintln(w, st.Muted.Render("Switched to context"), st.Selected.Render(name))
+	return nil
 }
 
 // CompleteContexts completes context names for shell completion.
 func CompleteContexts(_ *cobra.Command, args []string, _ string) ([]string, cobra.ShellCompDirective) {
-	f, err := loadFile()
+	f, err := jtConfig.LoadCurrent()
 	if err != nil {
 		return nil, cobra.ShellCompDirectiveNoFileComp
 	}

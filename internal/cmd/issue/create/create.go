@@ -54,6 +54,7 @@ $ jt issue create -tTask -sSummary -b"Body from flag" --template /path/to/templa
 func NewCmdCreate() *cobra.Command {
 	cmd := cobra.Command{
 		Use:     "create",
+		Aliases: []string{"new", "n"},
 		Short:   "Create an issue in a project",
 		Long:    helpText,
 		Example: examples,

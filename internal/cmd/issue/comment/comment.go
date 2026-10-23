@@ -14,7 +14,7 @@ func NewCmdComment() *cobra.Command {
 		Use:     "comment",
 		Short:   "Manage issue comments",
 		Long:    helpText,
-		Aliases: []string{"comments"},
+		Aliases: []string{"comments", "c"},
 		RunE:    comment,
 	}
 

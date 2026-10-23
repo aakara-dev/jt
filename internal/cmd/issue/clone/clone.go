@@ -30,6 +30,7 @@ $ jt issue clone ISSUE-1 -H"find me:replace with me"`
 func NewCmdClone() *cobra.Command {
 	cmd := cobra.Command{
 		Use:     "clone ISSUE-KEY",
+		Aliases: []string{"cp"},
 		Short:   "Clone duplicates an issue",
 		Long:    helpText,
 		Example: examples,

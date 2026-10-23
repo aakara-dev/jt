@@ -10,6 +10,8 @@ import (
 
 	"gopkg.in/yaml.v3"
 
+	"github.com/spf13/viper"
+
 	"github.com/aakara-dev/jt/internal/cmdutil"
 	"github.com/aakara-dev/jt/pkg/env"
 )
@@ -214,4 +216,17 @@ func setMapValue(m *yaml.Node, key string, v *yaml.Node) {
 		}
 	}
 	m.Content = append(m.Content, &yaml.Node{Kind: yaml.ScalarNode, Tag: "!!str", Value: key}, v)
+}
+
+// LoadCurrent loads the config file in use by this invocation (as resolved
+// by the root command), falling back to the default location.
+func LoadCurrent() (*File, error) {
+	path := viper.ConfigFileUsed()
+	if path == "" {
+		var err error
+		if path, err = Path(""); err != nil {
+			return nil, err
+		}
+	}
+	return LoadFile(path)
 }

@@ -26,7 +26,7 @@ func NewCmdIssue() *cobra.Command {
 		Use:         "issue",
 		Short:       "Issue manage issues in a project",
 		Long:        helpText,
-		Aliases:     []string{"issues"},
+		Aliases:     []string{"issues", "i"},
 		Annotations: map[string]string{"cmd:main": "true"},
 		RunE:        issue,
 	}

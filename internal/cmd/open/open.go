@@ -23,7 +23,7 @@ func NewCmdOpen() *cobra.Command {
 		Short:   "Open issue in a browser",
 		Long:    helpText,
 		Example: examples,
-		Aliases: []string{"browse", "navigate"},
+		Aliases: []string{"browse", "navigate", "o"},
 		Annotations: map[string]string{
 			"cmd:main":  "true",
 			"help:args": "[ISSUE-KEY]\tIssue key, eg: ISSUE-1",

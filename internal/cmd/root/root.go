@@ -9,6 +9,7 @@ import (
 	"github.com/spf13/viper"
 
 	"github.com/aakara-dev/jt/api"
+	"github.com/aakara-dev/jt/internal/cmd/alias"
 	"github.com/aakara-dev/jt/internal/cmd/board"
 	"github.com/aakara-dev/jt/internal/cmd/completion"
 	"github.com/aakara-dev/jt/internal/cmd/ctx"
@@ -150,6 +151,7 @@ func addChildCommands(cmd *cobra.Command) {
 	cmd.AddCommand(
 		initCmd.NewCmdInit(),
 		ctx.NewCmdCtx(),
+		alias.NewCmdAlias(),
 		issue.NewCmdIssue(),
 		epic.NewCmdEpic(),
 		sprint.NewCmdSprint(),

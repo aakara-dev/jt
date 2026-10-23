@@ -40,7 +40,7 @@ func NewCmdWatch() *cobra.Command {
 		Short:   "Add user to issue watchers",
 		Long:    helpText,
 		Example: examples,
-		Aliases: []string{"wat"},
+		Aliases: []string{"wat", "w"},
 		Annotations: map[string]string{
 			"help:args": `ISSUE-KEY	Issue key, eg: ISSUE-1
 WATCHER	Email or display name of the user to add to issue watchers`,

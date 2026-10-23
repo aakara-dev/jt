@@ -42,7 +42,7 @@ func NewCmdEdit() *cobra.Command {
 		Short:   "Edit an issue in a project",
 		Long:    helpText,
 		Example: examples,
-		Aliases: []string{"update", "modify"},
+		Aliases: []string{"update", "modify", "e"},
 		Annotations: map[string]string{
 			"help:args": `ISSUE-KEY	Issue key, eg: ISSUE-1`,
 		},

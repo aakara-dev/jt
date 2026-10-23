@@ -16,7 +16,7 @@ func NewCmdSprint() *cobra.Command {
 		Use:         "sprint",
 		Short:       "Sprint manage sprints in a project board",
 		Long:        helpText,
-		Aliases:     []string{"sprints"},
+		Aliases:     []string{"sprints", "sp"},
 		Annotations: map[string]string{"cmd:main": "true"},
 		RunE:        sprint,
 	}

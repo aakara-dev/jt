@@ -15,7 +15,7 @@ func NewCmdRelease() *cobra.Command {
 		Short:       "Release manages Jira Project versions",
 		Long:        helpText,
 		Annotations: map[string]string{"cmd:main": "true"},
-		Aliases:     []string{"releases"},
+		Aliases:     []string{"releases", "rel"},
 		RunE:        releases,
 	}
 

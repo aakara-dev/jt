@@ -14,7 +14,7 @@ func NewCmdProject() *cobra.Command {
 		Use:         "project",
 		Short:       "Project manages Jira projects",
 		Long:        helpText,
-		Aliases:     []string{"projects"},
+		Aliases:     []string{"projects", "proj"},
 		Annotations: map[string]string{"cmd:main": "true"},
 		RunE:        projects,
 	}

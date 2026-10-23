@@ -33,6 +33,7 @@ $ jt epic create -n"Epic with custom fields" --custom story-points=3`
 func NewCmdCreate() *cobra.Command {
 	return &cobra.Command{
 		Use:     "create",
+		Aliases: []string{"new", "n"},
 		Short:   "Create an epic in a project",
 		Long:    helpText,
 		Example: examples,

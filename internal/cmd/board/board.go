@@ -14,7 +14,7 @@ func NewCmdBoard() *cobra.Command {
 		Use:         "board",
 		Short:       "Board manages Jira boards in a project",
 		Long:        helpText,
-		Aliases:     []string{"boards"},
+		Aliases:     []string{"boards", "b"},
 		Annotations: map[string]string{"cmd:main": "true"},
 		RunE:        board,
 	}

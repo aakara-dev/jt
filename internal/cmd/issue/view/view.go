@@ -41,7 +41,7 @@ func NewCmdView() *cobra.Command {
 		Short:   "View displays contents of an issue",
 		Long:    helpText,
 		Example: examples,
-		Aliases: []string{"show"},
+		Aliases: []string{"show", "v"},
 		Annotations: map[string]string{
 			"help:args": "ISSUE-KEY\tIssue key, eg: ISSUE-1",
 		},
