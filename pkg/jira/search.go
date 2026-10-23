@@ -10,6 +10,8 @@ import (
 
 // SearchResult struct holds response from /search endpoint.
 type SearchResult struct {
+	StartAt       int      `json:"startAt"`
+	Total         int      `json:"total"`
 	IsLast        bool     `json:"isLast"`
 	NextPageToken string   `json:"nextPageToken"`
 	Issues        []*Issue `json:"issues"`
@@ -57,4 +59,32 @@ func (c *Client) search(path, ver string) (*SearchResult, error) {
 	err = json.NewDecoder(res.Body).Decode(&out)
 
 	return &out, err
+}
+
+// SavedFilter is a Jira saved filter.
+type SavedFilter struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
+	JQL  string `json:"jql"`
+}
+
+// FavouriteFiltersV2 returns the user's starred filters (Jira Server/DC).
+func (c *Client) FavouriteFiltersV2() ([]*SavedFilter, error) {
+	res, err := c.GetV2(context.Background(), "/filter/favourite", nil)
+	if err != nil {
+		return nil, err
+	}
+	if res == nil {
+		return nil, ErrEmptyResponse
+	}
+	defer func() { _ = res.Body.Close() }()
+
+	if res.StatusCode != http.StatusOK {
+		return nil, formatUnexpectedResponse(res)
+	}
+
+	var out []*SavedFilter
+	err = json.NewDecoder(res.Body).Decode(&out)
+
+	return out, err
 }

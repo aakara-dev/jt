@@ -1,0 +1,34 @@
+ Issues · DATA (12)  project = "DATA" ORDER BY updated DESC                                                                                 
+▌◼ DATA-1       ↑ Add retry with backoff… ● In Progress    Ada Lovelace     2h      │ ◼ DATA-1  ● In Progress                               
+ ✖ DATA-2       ⇈ Nightly orders job fai… ● To Do          Alan Turing      40m     │ Add retry with backoff to the orders loader           
+ ✔ DATA-3       = Document lineage for t… ● Done           Grace Hopper     3d      │                                                       
+ ◈ DATA-4       = Migrate batch jobs fro… ● In Progress    Ada Lovelace     1d      │ Type      Story                                       
+ ◼ DATA-5       ↓ Expose freshness metri… ● In Review      Linus Torvalds   5h      │ Priority  High                                        
+ ↳ DATA-6       = Add Delta OPTIMIZE to … ● To Do          –                9d      │ Assignee  Ada Lovelace                                
+ ✖ DATA-7       ↑ dbt incremental model … ● In Progress    Alan Turing      30m     │ Reporter  Grace Hopper                                
+ ◼ DATA-8       = Salt skewed join keys … ● To Do          Margaret Hamilt… 2d      │ Labels    pipeline, reliability                       
+ ✔ DATA-9       ⇊ Clean up stale feature… ● Done           Linus Torvalds   2w      │ Updated   2h ago                                      
+ ◼ DATA-10      ↑ Partition events table… ● To Do          Ada Lovelace     7h      │                                                       
+ ✔ DATA-11      = Rotate service princip… ● In Progress    Margaret Hamilt… 15m     │ ───────────────────────────────────────────────────── 
+ ◼ DATA-12      = Backfill 2024 partitio… ● To Do          –                4d      │                                                       
+                                                                                    │   ### Context                                         
+                                                                                    │                                                       
+                                                                                    │   The nightly orders load fails on transient ADLS     
+                                                                                    │   errors.                                             
+                                                                                    │                                                       
+                                                                                    │   ### Acceptance criteria                             
+                                                                                    │                                                       
+                                                                                    │   • retries 3x with exponential backoff               
+                                                                                    │   • logs row counts per partition                     
+                                                                                    │   • idempotent on rerun                               
+                                                                                    │                                                       
+                                                                                    │                                                       
+                                                                                    │                                                       
+                                                                                    │                                                       
+                                                                                    │                                                       
+                                                                                    │                                                       
+                                                                                    │                                                       
+                                                                                    │                                                       
+                                                                                    │                                                       
+                                                                                    │                                                       
+ jt  data  DATA  Issues · DATA                                                                  space menu · : cmd · ctrl+k search · ? help 

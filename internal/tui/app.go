@@ -1,0 +1,430 @@
+package tui
+
+import (
+	"fmt"
+	"strings"
+	"time"
+
+	tea "charm.land/bubbletea/v2"
+	"charm.land/lipgloss/v2"
+
+	"github.com/aakara-dev/jt/internal/theme"
+)
+
+const toastTTL = 3 * time.Second
+
+// cycleViews are the lists <tab> rotates through.
+var cycleViews = []string{"issues", "mine", "sprint", "recent"}
+
+// App is the root Bubble Tea model: a stack of views, an optional floating
+// popup, and a status bar.
+type App struct {
+	sess    Session
+	backend Backend
+	st      *styles
+	recent  *recentStore
+
+	stack []View
+	popup Popup
+
+	width, height int
+
+	toast    string
+	toastErr bool
+	toastID  int
+
+	history []string
+	cycle   int
+
+	startSearch bool
+	searchInput string
+}
+
+// Options configure how the TUI starts.
+type Options struct {
+	// Start is a ":" command to run first (e.g. "mine" or "DATA-12").
+	Start string
+	// Search opens the floating search with this input on startup.
+	Search     string
+	openSearch bool
+}
+
+// WithSearch opens the floating search with input on startup.
+func (o Options) WithSearch(input string) Options {
+	o.Search, o.openSearch = input, true
+	return o
+}
+
+// NewApp builds the root model.
+func NewApp(sess Session, b Backend, opts Options) *App {
+	st := newStyles(sess.Theme)
+	a := &App{sess: sess, backend: b, st: &st, recent: loadRecent(), startSearch: opts.openSearch, searchInput: opts.Search}
+	start := opts.Start
+	if start == "" {
+		start = a.defaultList()
+	}
+	if spec, ok := BuiltinList(start, sess); ok {
+		a.stack = []View{newListView(spec, b, a.st)}
+	} else if issueKeyRe.MatchString(start) {
+		a.stack = []View{newDetailView(strings.ToUpper(start), b, a.st)}
+	} else {
+		spec, _ := BuiltinList(a.defaultList(), sess)
+		a.stack = []View{newListView(spec, b, a.st)}
+	}
+	return a
+}
+
+func (a *App) defaultList() string {
+	if a.sess.Project == "" {
+		return "mine"
+	}
+	return "issues"
+}
+
+func (a *App) top() View { return a.stack[len(a.stack)-1] }
+
+// Init starts the first view.
+func (a *App) Init() tea.Cmd {
+	if a.startSearch {
+		return tea.Batch(a.top().Init(), a.openSearch(a.searchInput))
+	}
+	return a.top().Init()
+}
+
+// Update routes messages to the popup, global key handlers and views.
+func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	switch msg := msg.(type) {
+	case tea.WindowSizeMsg:
+		a.width, a.height = msg.Width, msg.Height
+		return a, nil
+
+	case pushViewMsg:
+		a.stack = append(a.stack, msg.v)
+		return a, msg.v.Init()
+	case popViewMsg:
+		if len(a.stack) > 1 {
+			a.stack = a.stack[:len(a.stack)-1]
+		}
+		return a, nil
+	case replaceViewMsg:
+		a.stack = []View{msg.v}
+		return a, msg.v.Init()
+
+	case openPopupMsg:
+		a.popup = msg.p
+		return a, nil
+	case closePopupMsg:
+		a.popup = nil
+		return a, nil
+
+	case toastMsg:
+		a.toastID++
+		a.toast, a.toastErr = msg.text, msg.err
+		id := a.toastID
+		return a, tea.Tick(toastTTL, func(time.Time) tea.Msg { return clearToastMsg{id} })
+	case clearToastMsg:
+		if msg.id == a.toastID {
+			a.toast = ""
+		}
+		return a, nil
+
+	case runCommandMsg:
+		return a, a.exec(msg.line)
+
+	case sessionChangedMsg:
+		a.sess = msg.s
+		spec, _ := BuiltinList(a.defaultList(), a.sess)
+		v := newListView(spec, a.backend, a.st)
+		a.stack = []View{v}
+		return a, tea.Batch(v.Init(), toast("context "+a.sess.Context+" · "+a.sess.Project))
+
+	case viewedIssueMsg:
+		a.recent.add(msg.iss)
+		return a, nil
+
+	case tea.KeyPressMsg:
+		return a, a.handleKey(msg)
+	}
+
+	// Async results go to every view (and the popup); each one ignores
+	// messages that are not addressed to it.
+	var cmds []tea.Cmd
+	if a.popup != nil {
+		var cmd tea.Cmd
+		a.popup, cmd = a.popup.Update(msg)
+		cmds = append(cmds, cmd)
+	}
+	for i, v := range a.stack {
+		var cmd tea.Cmd
+		a.stack[i], cmd = v.Update(msg)
+		cmds = append(cmds, cmd)
+	}
+	return a, tea.Batch(cmds...)
+}
+
+func (a *App) handleKey(k tea.KeyPressMsg) tea.Cmd {
+	key := k.String()
+	if key == keyQuit {
+		return tea.Quit
+	}
+	if a.popup != nil {
+		var cmd tea.Cmd
+		a.popup, cmd = a.popup.Update(k)
+		return cmd
+	}
+	top := a.top()
+	if top.Capturing() {
+		var cmd tea.Cmd
+		a.stack[len(a.stack)-1], cmd = top.Update(k)
+		return cmd
+	}
+
+	switch key {
+	case keyCmdline:
+		a.popup = newCmdline(a.completions, &a.history)
+		return nil
+	case keyLeader:
+		a.popup = whichKey{}
+		return nil
+	case keySearch:
+		return a.openSearch("")
+	case keyHelp:
+		a.popup = helpPopup{view: top.Hints()}
+		return nil
+	case keyContextSw:
+		return a.exec("ctx")
+	case keyNextView:
+		a.cycle = (a.cycle + 1) % len(cycleViews)
+		return a.exec(cycleViews[a.cycle])
+	case keyBack, keyBackAlt:
+		if len(a.stack) > 1 {
+			return pop
+		}
+		if key == keyBackAlt {
+			return tea.Quit
+		}
+		return nil
+	}
+
+	if iss := top.Selected(); iss != nil {
+		switch key {
+		case keyOpen:
+			return openInBrowser(a.sess, iss.Key)
+		case keyCopyKey:
+			return copyText(iss.Key, "copied "+iss.Key)
+		case keyCopyURL:
+			return copyText(a.sess.BrowseURL(iss.Key), "copied URL")
+		case keyCopyBr:
+			return copyBranch(iss)
+		}
+	}
+
+	var cmd tea.Cmd
+	a.stack[len(a.stack)-1], cmd = top.Update(k)
+	return cmd
+}
+
+func (a *App) openSearch(initial string) tea.Cmd {
+	p, cmd := newSearchPopup(a.sess, a.backend, a.st, a.recent, initial)
+	a.popup = p
+	return cmd
+}
+
+// exec runs a ":" command line.
+func (a *App) exec(line string) tea.Cmd {
+	line = strings.TrimSpace(strings.TrimPrefix(line, ":"))
+	name, arg, _ := strings.Cut(line, " ")
+	arg = strings.TrimSpace(arg)
+
+	switch name {
+	case "":
+		return nil
+	case "q", "quit", "q!", "qa":
+		return tea.Quit
+	case "help", "h":
+		a.popup = helpPopup{view: a.top().Hints()}
+		return nil
+	case "search", "s", "find":
+		return a.openSearch(arg)
+	case "ctx", "context":
+		if arg == "" {
+			return a.contextPicker()
+		}
+		return switchContext(arg)
+	case "theme":
+		if arg == "" {
+			return a.themePicker()
+		}
+		return a.setTheme(arg)
+	case "epic":
+		if arg == "" {
+			return a.replace(BuiltinList("epics", a.sess))
+		}
+		return push(newListView(EpicChildren(strings.ToUpper(arg)), a.backend, a.st))
+	case "query", "jql":
+		if arg == "" {
+			return a.openSearch("*")
+		}
+		if jql, ok := a.sess.Saved[arg]; ok {
+			return push(newListView(QueryList(arg, a.sess.ExpandJQL(jql)), a.backend, a.st))
+		}
+		return push(newListView(QueryList("JQL", arg), a.backend, a.st))
+	case "save":
+		lv, ok := a.top().(*listView)
+		if !ok {
+			return toast("open a list to save its query")
+		}
+		if arg == "" {
+			return toastErr(fmt.Errorf("usage: :save NAME"))
+		}
+		if err := SaveQuery(arg, lv.spec.JQL); err != nil {
+			return toastErr(err)
+		}
+		a.sess.Saved[arg] = lv.spec.JQL
+		return toast("saved query " + arg)
+	case "open":
+		if issueKeyRe.MatchString(arg) {
+			return openInBrowser(a.sess, strings.ToUpper(arg))
+		}
+	}
+
+	if spec, ok := BuiltinList(name, a.sess); ok {
+		return a.replace(spec, true)
+	}
+	if issueKeyRe.MatchString(name) {
+		return push(newDetailView(strings.ToUpper(name), a.backend, a.st))
+	}
+	return toastErr(fmt.Errorf("unknown command: %s", name))
+}
+
+// replace swaps the root list for spec, keeping the stack shallow like k9s.
+func (a *App) replace(spec ListSpec, ok bool) tea.Cmd {
+	if !ok {
+		return nil
+	}
+	v := newListView(spec, a.backend, a.st)
+	return func() tea.Msg { return replaceViewMsg{v} }
+}
+
+func switchContext(name string) tea.Cmd {
+	return func() tea.Msg {
+		s, err := SwitchContext(name)
+		if err != nil {
+			return toastMsg{text: err.Error(), err: true}
+		}
+		return sessionChangedMsg{s}
+	}
+}
+
+func (a *App) contextPicker() tea.Cmd {
+	if len(a.sess.Contexts) == 0 {
+		return toast("no contexts: add one with `jt ctx add NAME`")
+	}
+	items := make([]pickItem, 0, len(a.sess.Contexts))
+	for _, c := range a.sess.Contexts {
+		detail := c.Project
+		if c.Board != "" {
+			detail += " · " + c.Board
+		}
+		if c.Current {
+			detail += "  (current)"
+		}
+		items = append(items, pickItem{Label: c.Name, Detail: detail, Value: c.Name})
+	}
+	a.popup = newPicker("contexts", items, func(it pickItem) tea.Cmd {
+		return switchContext(it.Value)
+	}).cursorTo(a.sess.Context)
+	return nil
+}
+
+func (a *App) themePicker() tea.Cmd {
+	var items []pickItem
+	for _, n := range theme.Names() {
+		items = append(items, pickItem{Label: n, Value: n})
+	}
+	a.popup = newPicker("theme", items, func(it pickItem) tea.Cmd { return a.setTheme(it.Value) }).cursorTo(theme.Get(a.sess.Theme).Name)
+	return nil
+}
+
+func (a *App) setTheme(name string) tea.Cmd {
+	if theme.Get(name).Name != strings.ToLower(name) {
+		return toastErr(fmt.Errorf("unknown theme %q (have: %s)", name, strings.Join(theme.Names(), ", ")))
+	}
+	*a.st = newStyles(name)
+	a.sess.Theme = name
+	if err := SetTheme(name); err != nil {
+		return toastErr(err)
+	}
+	return toast("theme " + name)
+}
+
+// completions feeds the ":" prompt.
+func (a *App) completions(input string) []string {
+	cands := []string{"ctx", "theme", "search", "query", "save", "epic", "open", "help", "quit", "ctx -"}
+	cands = append(cands, BuiltinListNames...)
+	for _, c := range a.sess.Contexts {
+		cands = append(cands, "ctx "+c.Name)
+	}
+	for _, n := range theme.Names() {
+		cands = append(cands, "theme "+n)
+	}
+	for n := range a.sess.Saved {
+		cands = append(cands, "query "+n)
+	}
+	return fuzzyFilter(strings.TrimPrefix(input, ":"), cands)
+}
+
+// View renders the stack's top view, the status bar and any popup.
+func (a *App) View() tea.View {
+	v := tea.NewView(a.render())
+	v.AltScreen = true
+	v.WindowTitle = "jt · " + a.sess.Context
+	return v
+}
+
+func (a *App) render() string {
+	if a.width == 0 {
+		return ""
+	}
+	st := *a.st
+	bar := a.statusBar()
+	bodyH := a.height - lipgloss.Height(bar)
+	body := lipgloss.NewStyle().Width(a.width).Height(bodyH).MaxHeight(bodyH).Render(a.top().Render(a.width, bodyH))
+	screen := body + "\n" + bar
+	if a.popup != nil {
+		screen = placeCenter(screen, a.popup.Render(st, a.width, a.height), a.width, a.height)
+	}
+	return screen
+}
+
+func (a *App) statusBar() string {
+	st := *a.st
+	ctx := a.sess.Context
+	if ctx == "" {
+		ctx = "no context"
+	}
+	left := st.StatusKey.Render("jt") + st.StatusCtx.Render(ctx)
+	if a.sess.Project != "" {
+		left += st.StatusDim.Render(a.sess.Project)
+	}
+	var crumbs []string
+	for _, v := range a.stack {
+		crumbs = append(crumbs, v.Title())
+	}
+	left += st.StatusDim.Render(strings.Join(crumbs, " › "))
+
+	right := st.StatusDim.Render("space menu · : cmd · ctrl+k search · ? help")
+	if a.toast != "" {
+		if a.toastErr {
+			right = st.ToastErr.Render(a.toast)
+		} else {
+			right = st.ToastInfo.Render(a.toast)
+		}
+	}
+	gap := a.width - lipgloss.Width(left) - lipgloss.Width(right)
+	if gap < 1 {
+		left = fit(left, max(a.width-lipgloss.Width(right)-1, 0))
+		gap = max(a.width-lipgloss.Width(left)-lipgloss.Width(right), 0)
+	}
+	return left + st.StatusBar.Render(strings.Repeat(" ", gap)) + right
+}

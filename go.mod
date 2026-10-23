@@ -5,11 +5,14 @@ go 1.26.0
 toolchain go1.26.5
 
 require (
+	charm.land/bubbles/v2 v2.1.0
+	charm.land/bubbletea/v2 v2.0.6
 	charm.land/lipgloss/v2 v2.0.6
 	github.com/AlecAivazis/survey/v2 v2.3.7
 	github.com/atotto/clipboard v0.1.4
 	github.com/briandowns/spinner v1.23.2
 	github.com/charmbracelet/glamour v0.9.1
+	github.com/charmbracelet/x/ansi v0.11.8
 	github.com/cli/safeexec v1.0.1
 	github.com/cloudflare/cloudflared v0.0.0-20260306125340-d2a87e9b9345
 	github.com/fatih/color v1.18.0
@@ -25,6 +28,7 @@ require (
 	github.com/rivo/tview v0.0.0-20240406141410-79d4cc321256
 	github.com/rs/zerolog v1.20.0
 	github.com/russross/blackfriday/v2 v2.1.0
+	github.com/sahilm/fuzzy v0.1.1
 	github.com/spf13/cobra v1.8.0
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.18.2
@@ -42,7 +46,6 @@ require (
 	github.com/charmbracelet/colorprofile v0.4.3 // indirect
 	github.com/charmbracelet/lipgloss v1.1.0 // indirect
 	github.com/charmbracelet/ultraviolet v0.0.0-20260811164956-006e29f97886 // indirect
-	github.com/charmbracelet/x/ansi v0.11.8 // indirect
 	github.com/charmbracelet/x/cellbuf v0.0.15 // indirect
 	github.com/charmbracelet/x/term v0.2.2 // indirect
 	github.com/charmbracelet/x/termios v0.1.1 // indirect

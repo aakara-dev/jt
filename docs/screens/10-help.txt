@@ -1,0 +1,34 @@
+ Issues · DATA (12)  project = "DATA" ORDER BY updated DESC                                                                                 
+▌◼ DATA-1       ↑ Add retry with backoff… ● In Progress    Ada Lovelace     2h      │ ◼ DATA-1  ● In Progress
+ ✖ DATA-2       ⇈ Nightly orders job fai… ● To Do          Alan Turing      40m     │ Add retry with backoff to the orders loader
+ ✔ DATA-3       = Document lineage for t… ● Done           Grace Hopper     3d      │
+ ◈ DATA-4       = M╭───────────────────────────────────────────────────────────────────────────────────────────────────╮                   
+ ◼ DATA-5       ↓ E│  help                                                                                             │                   
+ ↳ DATA-6       = A│ Global                                   This view                                                │                   
+ ✖ DATA-7       ↑ d│ j/k ↓/↑          move                    /       filter                                           │                   
+ ◼ DATA-8       = S│ gg / G           top / bottom            p       toggle preview                                   │                   
+ ✔ DATA-9       ⇊ C│ ctrl+d / ctrl+u  half page down / up     enter   details                                          │                   
+ ◼ DATA-10      ↑ P│ enter / l        open                    ctrl+r  reload                                           │
+ ✔ DATA-11      = R│ esc / q / h      back                                                                             │───────────────────
+ ◼ DATA-12      = B│ space            leader menu             Commands                                                 │
+                   │ ctrl+k  space /  floating search         :issues :mine :sprint :backlog  issue lists              │               
+                   │ :                command line            :epics :recent :watching :bugs  more lists               │               
+                   │ ctrl+x           switch context          :epic KEY                       issues in an epic        │ transient ADLS
+                   │ tab              cycle list views        :ctx [name|-]                   switch context           │               
+                   │ o                open in browser         :query JQL|NAME                 run JQL or a saved query │               
+                   │ y / Y            copy key / URL          :save NAME                      save current list's JQL  │               
+                   │ b                copy git branch name    :search [text]                  floating search          │               
+                   │ ctrl+r           refresh                 :theme [name]                   change theme             │ckoff          
+                   │ ?                help                    :KEY-123                        open an issue            │               
+                   │ ctrl+c           quit                    :q / :quit                      quit                     │               
+                   │ esc close                                                                                         │
+                   ╰───────────────────────────────────────────────────────────────────────────────────────────────────╯
+                                                                                    │
+                                                                                    │
+                                                                                    │
+                                                                                    │
+                                                                                    │
+                                                                                    │
+                                                                                    │
+                                                                                    │
+ jt  data  DATA  Issues · DATA                                                                  space menu · : cmd · ctrl+k search · ? help 

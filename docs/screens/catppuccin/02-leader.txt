@@ -1,0 +1,34 @@
+ Issues · DATA (12)  project = "DATA" ORDER BY updated DESC                                                                                 
+▌◼ DATA-1       ↑ Add retry with backoff… ● In Progress    Ada Lovelace     2h      │ ◼ DATA-1  ● In Progress
+ ✖ DATA-2       ⇈ Nightly orders job fai… ● To Do          Alan Turing      40m     │ Add retry with backoff to the orders loader
+ ✔ DATA-3       = Document lineage for t… ● Done           Grace Hopper     3d      │
+ ◈ DATA-4       = Migrate batch jobs fro… ● In Progress    Ada Lovelace     1d      │ Type      Story                                      
+ ◼ DATA-5       ↓ Expose freshness metri… ● In Review      Linus Torvalds   5h      │ Priority  High                                       
+ ↳ DATA-6       = Add Delta OPTIMIZE to … ● To Do          –                9d      │ Assignee  Ada Lovelace                               
+ ✖ DATA-7       ↑ db╭──────────────────────────────────────────────────────────────────────────────────────────────────╮                   
+ ◼ DATA-8       = Sa│  <leader>                                                                                        │                   
+ ✔ DATA-9       ⇊ Cl│ Find                    Lists                   Context                 App                      │                   
+ ◼ DATA-10      ↑ Pa│ /  → search             i  → issues             c  → switch context     ?  → help                │
+ ✔ DATA-11      = Ro│ k  → jump to issue key  m  → assigned to me     -  → previous context   q  → quit                │───────────────────
+ ◼ DATA-12      = Ba│ j  → JQL query          s  → active sprint      t  → theme                                       │
+                    │ f  → saved filters      B  → backlog                                                             │               
+                    │                         e  → epics                                                               │               
+                    │                         r  → recently viewed                                                     │ transient ADLS
+                    │                         w  → watching                                                            │               
+                    │                         u  → updated today                                                       │               
+                    │ press a key · esc close                                                                          │               
+                    ╰──────────────────────────────────────────────────────────────────────────────────────────────────╯               
+                                                                                    │   • retries 3x with exponential backoff          
+                                                                                    │   • logs row counts per partition                
+                                                                                    │   • idempotent on rerun                          
+                                                                                    │
+                                                                                    │
+                                                                                    │
+                                                                                    │
+                                                                                    │
+                                                                                    │
+                                                                                    │
+                                                                                    │
+                                                                                    │
+                                                                                    │
+ jt  data  DATA  Issues · DATA                                                                  space menu · : cmd · ctrl+k search · ? help 

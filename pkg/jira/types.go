@@ -67,6 +67,14 @@ type Issue struct {
 	Fields IssueFields `json:"fields"`
 }
 
+// IssueStatus is an issue's workflow status.
+type IssueStatus struct {
+	Name     string `json:"name"`
+	Category struct {
+		Key string `json:"key"` // "new", "indeterminate" or "done"
+	} `json:"statusCategory"`
+}
+
 // IssueFields holds issue fields.
 type IssueFields struct {
 	Summary     string      `json:"summary"`
@@ -92,9 +100,7 @@ type IssueFields struct {
 		IsWatching bool `json:"isWatching"`
 		WatchCount int  `json:"watchCount"`
 	} `json:"watches"`
-	Status struct {
-		Name string `json:"name"`
-	} `json:"status"`
+	Status     IssueStatus `json:"status"`
 	Components []struct {
 		Name string `json:"name"`
 	} `json:"components"`

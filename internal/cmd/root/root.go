@@ -3,7 +3,12 @@ package root
 import (
 	"fmt"
 	"os"
+	"regexp"
 	"slices"
+
+	"golang.org/x/term"
+
+	"github.com/aakara-dev/jt/internal/cmd/ui"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -34,6 +39,8 @@ const (
 	jiraCLIHelpLink  = "https://github.com/aakara-dev/jt#getting-started"
 	jiraAPITokenLink = "https://id.atlassian.com/manage-profile/security/api-tokens"
 )
+
+var issueKeyArg = regexp.MustCompile(`^[A-Za-z][A-Za-z0-9_]+-\d+$`)
 
 var (
 	config      string
@@ -91,24 +98,28 @@ func NewCmdRoot() *cobra.Command {
 
 		SilenceUsage:  true,
 		SilenceErrors: true,
+		Args:          cobra.ArbitraryArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return cmd.Help()
+			// `jt` opens the TUI; `jt DATA-12` opens an issue in it.
+			if len(args) == 1 && issueKeyArg.MatchString(args[0]) {
+				requireSetup()
+				return ui.Run(args)
+			}
+			if len(args) > 0 {
+				return fmt.Errorf("unknown command %q for \"jt\"\nRun 'jt --help' for usage", args[0])
+			}
+			if !term.IsTerminal(int(os.Stdout.Fd())) {
+				return cmd.Help()
+			}
+			requireSetup()
+			return ui.Run(nil)
 		},
 		PersistentPreRun: func(cmd *cobra.Command, _ []string) {
 			subCmd := cmd.Name()
 			if !cmdRequireToken(subCmd) || cmd.Annotations[ctx.SkipTokenAnnotation] == "true" {
 				return
 			}
-
-			// mTLS and cf_access don't need Jira API Token.
-			if viper.GetString("auth_type") != string(jira.AuthTypeMTLS) && viper.GetString("auth_type") != string(jira.AuthTypeCFAccess) {
-				checkForJiraToken(viper.GetString("server"), viper.GetString("login"))
-			}
-
-			configFile := viper.ConfigFileUsed()
-			if !jiraConfig.Exists(configFile) {
-				cmdutil.Failed("Missing configuration file.\nRun 'jt init' to configure the tool.")
-			}
+			requireSetup()
 		},
 	}
 
@@ -152,6 +163,7 @@ func addChildCommands(cmd *cobra.Command) {
 		initCmd.NewCmdInit(),
 		ctx.NewCmdCtx(),
 		alias.NewCmdAlias(),
+		ui.NewCmdUI(),
 		issue.NewCmdIssue(),
 		epic.NewCmdEpic(),
 		sprint.NewCmdSprint(),
@@ -165,6 +177,19 @@ func addChildCommands(cmd *cobra.Command) {
 		release.NewCmdRelease(),
 		man.NewCmdMan(),
 	)
+}
+
+// requireSetup exits with guidance if there is no config file or API token.
+func requireSetup() {
+	// mTLS and cf_access don't need Jira API Token.
+	if viper.GetString("auth_type") != string(jira.AuthTypeMTLS) && viper.GetString("auth_type") != string(jira.AuthTypeCFAccess) {
+		checkForJiraToken(viper.GetString("server"), viper.GetString("login"))
+	}
+
+	configFile := viper.ConfigFileUsed()
+	if !jiraConfig.Exists(configFile) {
+		cmdutil.Failed("Missing configuration file.\nRun 'jt init' to configure the tool.")
+	}
 }
 
 func cmdRequireToken(cmd string) bool {
