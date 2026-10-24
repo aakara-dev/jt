@@ -16,6 +16,7 @@ import (
 	"github.com/aakara-dev/jt/api"
 	"github.com/aakara-dev/jt/internal/cmd/alias"
 	"github.com/aakara-dev/jt/internal/cmd/board"
+	"github.com/aakara-dev/jt/internal/cmd/branch"
 	"github.com/aakara-dev/jt/internal/cmd/completion"
 	"github.com/aakara-dev/jt/internal/cmd/epic"
 	"github.com/aakara-dev/jt/internal/cmd/find"
@@ -28,6 +29,7 @@ import (
 	"github.com/aakara-dev/jt/internal/cmd/release"
 	"github.com/aakara-dev/jt/internal/cmd/serverinfo"
 	"github.com/aakara-dev/jt/internal/cmd/sprint"
+	"github.com/aakara-dev/jt/internal/cmd/standup"
 	"github.com/aakara-dev/jt/internal/cmd/version"
 	"github.com/aakara-dev/jt/internal/cmdutil"
 	jiraConfig "github.com/aakara-dev/jt/internal/config"
@@ -153,6 +155,8 @@ func addChildCommands(cmd *cobra.Command) {
 		alias.NewCmdAlias(),
 		ui.NewCmdUI(),
 		find.NewCmdFind(),
+		branch.NewCmdBranch(),
+		standup.NewCmdStandup(),
 		issue.NewCmdIssue(),
 		epic.NewCmdEpic(),
 		sprint.NewCmdSprint(),
