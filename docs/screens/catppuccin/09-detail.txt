@@ -1,0 +1,34 @@
+ ◼ DATA-1  ● In Progress  ↑ High                                                                                                            
+                                                                                                                                            
+ Add retry with backoff to the orders loader                                                                                                
+                                                                                                                                            
+ Type          Story                                                                                                                        
+ Assignee      Ada Lovelace                                                                                                                 
+ Reporter      Grace Hopper                                                                                                                 
+ Labels        pipeline, reliability                                                                                                        
+ Components    –                                                                                                                            
+ Fix versions  –                                                                                                                            
+ Created       12h ago                                                                                                                      
+ Updated       2h ago                                                                                                                       
+ Watchers      0                                                                                                                            
+                                                                                                                                            
+ Description ───────────────────────────────────────────────────────────────────────────────────────────────────────────                    
+                                                                                                                                            
+  ### Context                                                                                                                               
+                                                                                                                                            
+  The nightly orders load fails on transient ADLS errors.                                                                                   
+                                                                                                                                            
+  ### Acceptance criteria                                                                                                                   
+                                                                                                                                            
+  • retries 3x with exponential backoff                                                                                                     
+  • logs row counts per partition                                                                                                           
+  • idempotent on rerun                                                                                                                     
+                                                                                                                                            
+                                                                                                                                            
+                                                                                                                                            
+                                                                                                                                            
+                                                                                                                                            
+                                                                                                                                            
+                                                                                                                                            
+                                                                                                                                            
+ jt  data  DATA  Issues · DATA › DATA-1                                                         space menu · : cmd · ctrl+k search · ? help 

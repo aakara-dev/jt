@@ -8,31 +8,31 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	"github.com/ankitpokhrel/jira-cli/api"
-	"github.com/ankitpokhrel/jira-cli/internal/cmdcommon"
-	"github.com/ankitpokhrel/jira-cli/internal/cmdutil"
-	"github.com/ankitpokhrel/jira-cli/internal/query"
-	"github.com/ankitpokhrel/jira-cli/pkg/adf"
-	"github.com/ankitpokhrel/jira-cli/pkg/jira"
-	"github.com/ankitpokhrel/jira-cli/pkg/md"
-	"github.com/ankitpokhrel/jira-cli/pkg/surveyext"
+	"github.com/aakara-dev/jt/api"
+	"github.com/aakara-dev/jt/internal/cmdcommon"
+	"github.com/aakara-dev/jt/internal/cmdutil"
+	"github.com/aakara-dev/jt/internal/query"
+	"github.com/aakara-dev/jt/pkg/adf"
+	"github.com/aakara-dev/jt/pkg/jira"
+	"github.com/aakara-dev/jt/pkg/md"
+	"github.com/aakara-dev/jt/pkg/surveyext"
 )
 
 const (
 	helpText = `Edit an issue in a given project with minimal information.`
-	examples = `$ jira issue edit ISSUE-1
+	examples = `$ jt issue edit ISSUE-1
 
 # Edit issue in the configured project
-$ jira issue edit ISSUE-1 -s"New Bug" -yHigh -lbug -lurgent -CBackend -b"Bug description"
+$ jt issue edit ISSUE-1 -s"New Bug" -yHigh -lbug -lurgent -CBackend -b"Bug description"
 
 # Use --no-input option to disable interactive prompt
-$ jira issue edit ISSUE-1 -s"New updated summary" --no-input
+$ jt issue edit ISSUE-1 -s"New updated summary" --no-input
 
 # Use pipe to read the description body directly from standard input
-$ echo "Description from stdin" | jira issue edit ISSUE-1 -s"New updated summary"  --no-input
+$ echo "Description from stdin" | jt issue edit ISSUE-1 -s"New updated summary"  --no-input
 
 # Use minus (-) to remove label, component or fixVersion
-$ jira issue edit ISSUE-1 --label -urgent --component -BE --fix-version -v1.0`
+$ jt issue edit ISSUE-1 --label -urgent --component -BE --fix-version -v1.0`
 )
 
 // NewCmdEdit is an edit command.
@@ -42,7 +42,7 @@ func NewCmdEdit() *cobra.Command {
 		Short:   "Edit an issue in a project",
 		Long:    helpText,
 		Example: examples,
-		Aliases: []string{"update", "modify"},
+		Aliases: []string{"update", "modify", "e"},
 		Annotations: map[string]string{
 			"help:args": `ISSUE-KEY	Issue key, eg: ISSUE-1`,
 		},

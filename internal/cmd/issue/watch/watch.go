@@ -10,21 +10,21 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	"github.com/ankitpokhrel/jira-cli/api"
-	"github.com/ankitpokhrel/jira-cli/internal/cmdutil"
-	"github.com/ankitpokhrel/jira-cli/internal/query"
-	"github.com/ankitpokhrel/jira-cli/pkg/jira"
+	"github.com/aakara-dev/jt/api"
+	"github.com/aakara-dev/jt/internal/cmdutil"
+	"github.com/aakara-dev/jt/internal/query"
+	"github.com/aakara-dev/jt/pkg/jira"
 )
 
 const (
 	helpText = `Adds user to issue watchers.`
-	examples = `$ jira issue watch ISSUE-1 jon@domain.tld
+	examples = `$ jt issue watch ISSUE-1 jon@domain.tld
 
 # Watcher name or email needs to be an exact match
-$ jira issue watch ISSUE-1 "Jon Doe"
+$ jt issue watch ISSUE-1 "Jon Doe"
 
 # Add self to watchers
-$ jira issue watch ISSUE-1 $(jira me)`
+$ jt issue watch ISSUE-1 $(jt me)`
 
 	maxResults = 100
 	lineBreak  = "----------"
@@ -40,7 +40,7 @@ func NewCmdWatch() *cobra.Command {
 		Short:   "Add user to issue watchers",
 		Long:    helpText,
 		Example: examples,
-		Aliases: []string{"wat"},
+		Aliases: []string{"wat", "w"},
 		Annotations: map[string]string{
 			"help:args": `ISSUE-KEY	Issue key, eg: ISSUE-1
 WATCHER	Email or display name of the user to add to issue watchers`,

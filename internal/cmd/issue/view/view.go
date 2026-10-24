@@ -6,22 +6,22 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	"github.com/ankitpokhrel/jira-cli/api"
-	"github.com/ankitpokhrel/jira-cli/internal/cmdutil"
-	tuiView "github.com/ankitpokhrel/jira-cli/internal/view"
-	"github.com/ankitpokhrel/jira-cli/pkg/jira"
-	"github.com/ankitpokhrel/jira-cli/pkg/jira/filter/issue"
+	"github.com/aakara-dev/jt/api"
+	"github.com/aakara-dev/jt/internal/cmdutil"
+	tuiView "github.com/aakara-dev/jt/internal/view"
+	"github.com/aakara-dev/jt/pkg/jira"
+	"github.com/aakara-dev/jt/pkg/jira/filter/issue"
 )
 
 const (
 	helpText = `View displays contents of an issue.`
-	examples = `$ jira issue view ISSUE-1
+	examples = `$ jt issue view ISSUE-1
 
 # Show 5 recent comments when viewing the issue
-$ jira issue view ISSUE-1 --comments 5
+$ jt issue view ISSUE-1 --comments 5
 
 # Get the raw JSON data
-$ jira issue view ISSUE-1 --raw`
+$ jt issue view ISSUE-1 --raw`
 
 	flagRaw      = "raw"
 	flagDebug    = "debug"
@@ -41,7 +41,7 @@ func NewCmdView() *cobra.Command {
 		Short:   "View displays contents of an issue",
 		Long:    helpText,
 		Example: examples,
-		Aliases: []string{"show"},
+		Aliases: []string{"show", "v"},
 		Annotations: map[string]string{
 			"help:args": "ISSUE-KEY\tIssue key, eg: ISSUE-1",
 		},

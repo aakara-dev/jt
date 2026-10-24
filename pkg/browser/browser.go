@@ -7,11 +7,13 @@ import (
 
 	"github.com/google/shlex"
 	"github.com/pkg/browser"
+
+	"github.com/aakara-dev/jt/pkg/env"
 )
 
 // Browse opens given url in a web browser.
 //
-// It looks for `JIRA_BROWSER` and `BROWSER` env respectively to decide which
+// It looks for `JT_BROWSER` (or `JIRA_BROWSER`) and `BROWSER` env respectively to decide which
 // executable to use. If none of them are set, the default browser is invoked.
 func Browse(url string) error {
 	opener := getBrowserFromENV()
@@ -42,7 +44,7 @@ func Browse(url string) error {
 }
 
 func getBrowserFromENV() string {
-	br := os.Getenv("JIRA_BROWSER")
+	br := env.Get("BROWSER")
 	if br == "" {
 		br = os.Getenv("BROWSER")
 	}

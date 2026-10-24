@@ -12,6 +12,8 @@ import (
 	"github.com/AlecAivazis/survey/v2"
 	"github.com/AlecAivazis/survey/v2/terminal"
 	shellquote "github.com/kballard/go-shellquote"
+
+	"github.com/aakara-dev/jt/pkg/env"
 )
 
 var (
@@ -20,7 +22,7 @@ var (
 )
 
 func init() {
-	if j := os.Getenv("JIRA_EDITOR"); j != "" {
+	if j := env.Get("EDITOR"); j != "" {
 		defaultEditor = j
 	} else if v := os.Getenv("VISUAL"); v != "" {
 		defaultEditor = v

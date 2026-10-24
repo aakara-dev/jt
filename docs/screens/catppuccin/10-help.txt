@@ -1,0 +1,36 @@
+ Issues · DATA (12)╭───────────────────────────────────────────────────────────────────────────────────────────────────╮                    
+▌◼ DATA-1       ↑ A│  help                                                                                             │
+ ✖ DATA-2       ⇈ N│ Global                                   This view                                                │rs loader
+ ✔ DATA-3       = D│ j/k ↓/↑          move                    /       filter                                           │
+ ◈ DATA-4       = M│ gg / G           top / bottom            p       toggle preview                                   │                   
+ ◼ DATA-5       ↓ E│ ctrl+d / ctrl+u  half page down / up     enter   details                                          │                   
+ ↳ DATA-6       = A│ enter / l        open                    v / V   mark / mark all (bulk actions)                   │                   
+ ✖ DATA-7       ↑ d│ esc / q / h      back                    K / J   rank up / down                                   │                   
+ ◼ DATA-8       = S│ space            leader menu             ctrl+r  reload                                           │                   
+ ✔ DATA-9       ⇊ C│ ctrl+k  space /  floating search         t       transition                                       │                   
+ ◼ DATA-10      ↑ P│ :                command line            a / A   assign / assign to me                            │
+ ✔ DATA-11      = R│ ctrl+p           switch project          c       comment                                          │───────────────────
+ ◼ DATA-12      = B│ tab              cycle list views        e / E   edit field / edit description in $EDITOR         │
+                   │ o                open in browser         n       new issue                                        │               
+                   │ y / Y            copy key / URL          w       log work (e.g. 1h 30m fixed it)                  │               
+                   │ b                copy git branch name    L       link to another issue                            │ transient ADLS
+                   │ ctrl+r           refresh                 W       watch / unwatch                                  │               
+                   │ ?                help                    m / B   move to sprint / backlog                         │               
+                   │ ctrl+c           quit                    D       delete (asks first)                              │               
+                   │                                                                                                   │               
+                   │                                          Commands                                                 │ckoff          
+                   │                                          :home                           my work dashboard        │               
+                   │                                          :board                          sprint / kanban board    │               
+                   │                                          :issues :mine :sprint :backlog  issue lists              │
+                   │                                          :epics :recent :watching :bugs  more lists               │
+                   │                                          :epic KEY                       issues in an epic        │
+                   │                                          :project [name|-]  :p           switch project           │
+                   │                                          :query JQL|NAME                 run JQL or a saved query │
+                   │                                          :save NAME                      save current list's JQL  │
+                   │                                          :search [text]                  floating search          │
+                   │                                          :theme [name]                   change theme             │
+                   │                                          :export [csv|md] [path]         export the current view  │
+                   │                                          :KEY-123                        open an issue            │
+ jt  data  DATA  Is│                                          :q / :quit                      quit                     │l+k search · ? help 
+                   │ esc close                                                                                         │
+                   ╰───────────────────────────────────────────────────────────────────────────────────────────────────╯

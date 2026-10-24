@@ -3,7 +3,7 @@ package board
 import (
 	"github.com/spf13/cobra"
 
-	"github.com/ankitpokhrel/jira-cli/internal/cmd/board/list"
+	"github.com/aakara-dev/jt/internal/cmd/board/list"
 )
 
 const helpText = `Board manages Jira boards in a project. See available commands below.`
@@ -14,7 +14,7 @@ func NewCmdBoard() *cobra.Command {
 		Use:         "board",
 		Short:       "Board manages Jira boards in a project",
 		Long:        helpText,
-		Aliases:     []string{"boards"},
+		Aliases:     []string{"boards", "b"},
 		Annotations: map[string]string{"cmd:main": "true"},
 		RunE:        board,
 	}

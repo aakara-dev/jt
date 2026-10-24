@@ -1,0 +1,34 @@
+ Issues · DATA (12)  project = "DATA" ORDER BY updated DESC                                                                                 
+▌◼ DATA-1       ↑ Add retry with backoff… ● In Progress    Ada Lovelace     2h      │ ◼ DATA-1  ● In Progress
+ ✖ DATA-2     ╭──────────────────────────────────────────────────────────────────────────────────────────────────────────────╮der
+ ✔ DATA-3     │  search                                                                                                      │
+ ◈ DATA-4     │  key  ❯ #7                                                                                                   │             
+ ◼ DATA-5     │ ──────────────────────────────────────────────────────────────────────────────────────────────────────────── │             
+ ↳ DATA-6     │ ▌◼ DATA-1       Add retry with backoff to… │ ◼ DATA-1  ● In Progress                                         │             
+ ✖ DATA-7     │  ✖ DATA-2       Nightly orders job fails … │ Add retry with backoff to the orders loader                     │             
+ ◼ DATA-8     │  ✔ DATA-3       Document lineage for the … │                                                                 │             
+ ✔ DATA-9     │  ◈ DATA-4       Migrate batch jobs from O… │ Type      Story                                                 │             
+ ◼ DATA-10    │  ◼ DATA-5       Expose freshness metrics … │ Priority  High                                                  │
+ ✔ DATA-11    │  ↳ DATA-6       Add Delta OPTIMIZE to wee… │ Assignee  Ada Lovelace                                          │─────────────
+ ◼ DATA-12    │  ✖ DATA-7       dbt incremental model dup… │ Reporter  Grace Hopper                                          │
+              │  ◼ DATA-8       Salt skewed join keys in … │ Labels    pipeline, reliability                                 │         
+              │  ✔ DATA-9       Clean up stale feature br… │ Updated   2h ago                                                │         
+              │  ◼ DATA-10      Partition events table by… │                                                                 │ient ADLS
+              │  ✔ DATA-11      Rotate service principal … │ ──────────────────────────────────────────────────────────────  │         
+              │  ◼ DATA-12      Backfill 2024 partitions … │                                                                 │         
+              │                                            │   ### Context                                                   │         
+              │                                            │                                                                 │         
+              │                                            │   The nightly orders load fails on transient ADLS errors.       │         
+              │                                            │                                                                 │         
+              │                                            │   ### Acceptance criteria                                       │         
+              │                                            │                                                                 │
+              │                                            │   • retries 3x with exponential backoff                         │
+              │                                            │   • logs row counts per partition                               │
+              │                                            │   • idempotent on rerun                                         │
+              │ 12 of 12 · key = DATA-7                                                                                      │
+              │ enter open · tab mode · ctrl+o browser · ctrl+y copy · ctrl+q to list · ctrl+s save · esc                    │
+              ╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+                                                                                    │
+                                                                                    │
+                                                                                    │
+ jt  data  DATA  Issues · DATA                                                                  space menu · : cmd · ctrl+k search · ? help 

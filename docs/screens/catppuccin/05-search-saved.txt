@@ -1,0 +1,34 @@
+ Issues · DATA (12)  project = "DATA" ORDER BY updated DESC                                                                                 
+▌◼ DATA-1       ↑ Add retry with backoff… ● In Progress    Ada Lovelace     2h      │ ◼ DATA-1  ● In Progress
+ ✖ DATA-2     ╭──────────────────────────────────────────────────────────────────────────────────────────────────────────────╮der
+ ✔ DATA-3     │  search                                                                                                      │
+ ◈ DATA-4     │  saved  ❯ *                                                                                                  │             
+ ◼ DATA-5     │ ──────────────────────────────────────────────────────────────────────────────────────────────────────────── │             
+ ↳ DATA-6     │ ▌★ blocked                       saved     │ project = DATA AND status = Blocked                             │             
+ ✖ DATA-7     │  ★ Team board                    filter 10 │                                                                 │             
+ ◼ DATA-8     │                                            │                                                                 │             
+ ✔ DATA-9     │                                            │                                                                 │             
+ ◼ DATA-10    │                                            │                                                                 │
+ ✔ DATA-11    │                                            │                                                                 │─────────────
+ ◼ DATA-12    │                                            │                                                                 │
+              │                                            │                                                                 │         
+              │                                            │                                                                 │         
+              │                                            │                                                                 │ient ADLS
+              │                                            │                                                                 │         
+              │                                            │                                                                 │         
+              │                                            │                                                                 │         
+              │                                            │                                                                 │         
+              │                                            │                                                                 │         
+              │                                            │                                                                 │         
+              │                                            │                                                                 │         
+              │                                            │                                                                 │
+              │                                            │                                                                 │
+              │                                            │                                                                 │
+              │                                            │                                                                 │
+              │ saved queries and favourite filters                                                                          │
+              │ enter open · tab mode · ctrl+o browser · ctrl+y copy · ctrl+q to list · ctrl+s save · esc                    │
+              ╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+                                                                                    │
+                                                                                    │
+                                                                                    │
+ jt  data  DATA  Issues · DATA                                                                  space menu · : cmd · ctrl+k search · ? help 

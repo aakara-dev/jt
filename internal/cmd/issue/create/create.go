@@ -8,44 +8,44 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	"github.com/ankitpokhrel/jira-cli/api"
-	"github.com/ankitpokhrel/jira-cli/internal/cmdcommon"
-	"github.com/ankitpokhrel/jira-cli/internal/cmdutil"
-	"github.com/ankitpokhrel/jira-cli/internal/query"
-	"github.com/ankitpokhrel/jira-cli/pkg/jira"
-	"github.com/ankitpokhrel/jira-cli/pkg/surveyext"
-	"github.com/ankitpokhrel/jira-cli/pkg/tui"
+	"github.com/aakara-dev/jt/api"
+	"github.com/aakara-dev/jt/internal/cmdcommon"
+	"github.com/aakara-dev/jt/internal/cmdutil"
+	"github.com/aakara-dev/jt/internal/query"
+	"github.com/aakara-dev/jt/pkg/jira"
+	"github.com/aakara-dev/jt/pkg/surveyext"
+	"github.com/aakara-dev/jt/pkg/tui"
 )
 
 const (
 	helpText = `Create an issue in a given project with minimal information.`
-	examples = `$ jira issue create
+	examples = `$ jt issue create
 
 # Create issue in the configured project
-$ jira issue create -tBug -s"New Bug" -yHigh -lbug -lurgent -b"Bug description"
+$ jt issue create -tBug -s"New Bug" -yHigh -lbug -lurgent -b"Bug description"
 
 # Create issue in another project
-$ jira issue create -pPRJ -tBug -yHigh -s"New Bug" -b$'Bug description\n\nSome more text'
+$ jt issue create -pPRJ -tBug -yHigh -s"New Bug" -b$'Bug description\n\nSome more text'
 
 # Create issue and set custom fields
-# See https://github.com/ankitpokhrel/jira-cli/discussions/346
-$ jira issue create -tStory -s"Issue with custom fields" --custom story-points=3
+# See https://github.com/aakara-dev/jt/discussions/346
+$ jt issue create -tStory -s"Issue with custom fields" --custom story-points=3
 
 # Load description from template file
-$ jira issue create --template /path/to/template.tmpl
+$ jt issue create --template /path/to/template.tmpl
 
 # Get description from standard input
-$ jira issue create --template -
+$ jt issue create --template -
 
 # Create issue in the configured project with JSON output
-$ jira issue create --raw
+$ jt issue create --raw
 
 # Or, use pipe to read input directly from standard input
-$ echo "Description from stdin" | jira issue create -s"Summary" -tTask
+$ echo "Description from stdin" | jt issue create -s"Summary" -tTask
 
 # For issue description, the flag --body/-b takes precedence over the --template flag
 # The example below will add "Body from flag" as an issue description
-$ jira issue create -tTask -sSummary -b"Body from flag" --template /path/to/template.tpl`
+$ jt issue create -tTask -sSummary -b"Body from flag" --template /path/to/template.tpl`
 
 	flagRaw = "raw"
 )
@@ -54,6 +54,7 @@ $ jira issue create -tTask -sSummary -b"Body from flag" --template /path/to/temp
 func NewCmdCreate() *cobra.Command {
 	cmd := cobra.Command{
 		Use:     "create",
+		Aliases: []string{"new", "n"},
 		Short:   "Create an issue in a project",
 		Long:    helpText,
 		Example: examples,

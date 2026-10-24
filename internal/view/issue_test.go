@@ -6,9 +6,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/ankitpokhrel/jira-cli/pkg/adf"
-	"github.com/ankitpokhrel/jira-cli/pkg/jira"
-	"github.com/ankitpokhrel/jira-cli/pkg/tui"
+	"github.com/aakara-dev/jt/pkg/adf"
+	"github.com/aakara-dev/jt/pkg/jira"
+	"github.com/aakara-dev/jt/pkg/tui"
 )
 
 func TestIssueDetailsRenderInPlainView(t *testing.T) {
@@ -45,9 +45,7 @@ func TestIssueDetailsRenderInPlainView(t *testing.T) {
 			Reporter: struct {
 				Name string `json:"displayName"`
 			}{Name: "Person Z"},
-			Status: struct {
-				Name string `json:"name"`
-			}{Name: "Done"},
+			Status: jira.IssueStatus{Name: "Done"},
 			Components: []struct {
 				Name string `json:"name"`
 			}{{Name: "BE"}, {Name: "FE"}},
@@ -110,9 +108,7 @@ func TestIssueDetailsWithV2Description(t *testing.T) {
 			Reporter: struct {
 				Name string `json:"displayName"`
 			}{Name: "Person Z"},
-			Status: struct {
-				Name string `json:"name"`
-			}{Name: "Done"},
+			Status: jira.IssueStatus{Name: "Done"},
 			Components: []struct {
 				Name string `json:"name"`
 			}{{Name: "BE"}, {Name: "FE"}},
@@ -142,9 +138,7 @@ func TestIssueDetailsWithV2Description(t *testing.T) {
 					Key: "TEST-2",
 					Fields: jira.IssueFields{
 						Summary: "Subtask 1",
-						Status: struct {
-							Name string `json:"name"`
-						}{Name: "TO DO"},
+						Status:  jira.IssueStatus{Name: "TO DO"},
 						Priority: struct {
 							Name string `json:"name"`
 						}{Name: "High"},
@@ -154,9 +148,7 @@ func TestIssueDetailsWithV2Description(t *testing.T) {
 					Key: "TEST-3",
 					Fields: jira.IssueFields{
 						Summary: "Subtask 2",
-						Status: struct {
-							Name string `json:"name"`
-						}{Name: "Done"},
+						Status:  jira.IssueStatus{Name: "Done"},
 						Priority: struct {
 							Name string `json:"name"`
 						}{Name: "Normal"},
@@ -186,9 +178,7 @@ func TestIssueDetailsWithV2Description(t *testing.T) {
 							IssueType: jira.IssueType{Name: "Bug"},
 							Priority: struct {
 								Name string `json:"name"`
-							}{Name: "High"}, Status: struct {
-								Name string `json:"name"`
-							}{Name: "TO DO"},
+							}{Name: "High"}, Status: jira.IssueStatus{Name: "TO DO"},
 						},
 					},
 				},
@@ -205,9 +195,7 @@ func TestIssueDetailsWithV2Description(t *testing.T) {
 							IssueType: jira.IssueType{Name: "Bug"},
 							Priority: struct {
 								Name string `json:"name"`
-							}{Name: "Urgent"}, Status: struct {
-								Name string `json:"name"`
-							}{Name: "Done"},
+							}{Name: "Urgent"}, Status: jira.IssueStatus{Name: "Done"},
 						},
 					},
 				},
@@ -227,10 +215,10 @@ func TestIssueDetailsWithV2Description(t *testing.T) {
 
 	expected := "🐞 Bug  ✅ Done  ⌛ Sun, 13 Dec 20  👷 Person A  🔑️ TEST-1  💭 3 comments  \U0001F9F5 2 linked\n# This is a test\n⏱️  Sun, 13 Dec 20  🔎 Person Z  🚀 High  📦 BE, FE  🏷️  None  👀 0 watchers\n\n------------------------ Description ------------------------\n\n# Title\n## Subtitle\nThis is a **bold** and _italic_ text with [a link](https://ankit.pl) in between.\n\n\n------------------------ 2 Subtasks ------------------------\n\n\n SUBTASKS\n\n  TEST-2 Subtask 1 • High   • TO DO\n  TEST-3 Subtask 2 • Normal • Done \n\n\n\n------------------------ Linked Issues ------------------------\n\n\n BLOCKS\n\n  TEST-2 Something is broken   • Bug • High   • TO DO\n\n RELATES TO\n\n  TEST-3 Everything is on fire • Bug • Urgent • Done \n\n\n\n------------------------ 3 Comments ------------------------\n\n\n Person C • Wed, 24 Nov 21 • Latest comment\n\nTest comment C\n\n\n\n Person B • Tue, 23 Nov 21\n\nTest comment B\n\n"
 	if xterm256() {
-		expected += "\x1b[38;5;242mUse --comments <limit> with `jira issue view` to load more comments\x1b[m\n\n"
+		expected += "\x1b[38;5;242mUse --comments <limit> with `jt issue view` to load more comments\x1b[m\n\n"
 		expected += "\x1b[38;5;242mView this issue on Jira: https://test.local/browse/TEST-1\x1b[m"
 	} else {
-		expected += "\x1b[0;90mUse --comments <limit> with `jira issue view` to load more comments\x1b[0m\n\n"
+		expected += "\x1b[0;90mUse --comments <limit> with `jt issue view` to load more comments\x1b[0m\n\n"
 		expected += "\x1b[0;90mView this issue on Jira: https://test.local/browse/TEST-1\x1b[0m"
 	}
 	actual := issue.String()

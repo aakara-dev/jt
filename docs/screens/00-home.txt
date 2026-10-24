@@ -1,0 +1,34 @@
+ In progress 8 of 12 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 
+ ▌◼ DATA-1       ↑ Add retry with backoff to the orders loader                                                     ● In Progress    2h      
+  ✖ DATA-2       ⇈ Nightly orders job fails on NULL customer ids                                                   ● To Do          40m     
+  ✔ DATA-3       = Document lineage for the finance mart                                                           ● Done           3d      
+  ◈ DATA-4       = Migrate batch jobs from Oracle to Databricks                                                    ● In Progress    1d      
+  ◼ DATA-5       ↓ Expose freshness metrics in Grafana                                                             ● In Review      5h      
+  ↳ DATA-6       = Add Delta OPTIMIZE to weekly maintenance                                                        ● To Do          9d      
+  ✖ DATA-7       ↑ dbt incremental model duplicates late-arriving rows                                             ● In Progress    30m     
+  ◼ DATA-8       = Salt skewed join keys in sessionisation job                                                     ● To Do          2d      
+                                                                                                                                            
+ Up next 8 of 12 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 
+  ◼ DATA-1       ↑ Add retry with backoff to the orders loader                                                     ● In Progress    2h      
+  ✖ DATA-2       ⇈ Nightly orders job fails on NULL customer ids                                                   ● To Do          40m     
+  ✔ DATA-3       = Document lineage for the finance mart                                                           ● Done           3d      
+  ◈ DATA-4       = Migrate batch jobs from Oracle to Databricks                                                    ● In Progress    1d      
+  ◼ DATA-5       ↓ Expose freshness metrics in Grafana                                                             ● In Review      5h      
+  ↳ DATA-6       = Add Delta OPTIMIZE to weekly maintenance                                                        ● To Do          9d      
+  ✖ DATA-7       ↑ dbt incremental model duplicates late-arriving rows                                             ● In Progress    30m     
+  ◼ DATA-8       = Salt skewed join keys in sessionisation job                                                     ● To Do          2d      
+                                                                                                                                            
+ Due this week 5 of 12 ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 
+  ◼ DATA-1       ↑ Add retry with backoff to the orders loader                                                     ● In Progress    2h      
+  ✖ DATA-2       ⇈ Nightly orders job fails on NULL customer ids                                                   ● To Do          40m     
+  ✔ DATA-3       = Document lineage for the finance mart                                                           ● Done           3d      
+  ◈ DATA-4       = Migrate batch jobs from Oracle to Databricks                                                    ● In Progress    1d      
+  ◼ DATA-5       ↓ Expose freshness metrics in Grafana                                                             ● In Review      5h      
+                                                                                                                                            
+ Watching · updated in the last 2 days 6 of 12 ──────────────────────────────────────────────────────────────────────────────────────────── 
+  ◼ DATA-1       ↑ Add retry with backoff to the orders loader                                                     ● In Progress    2h      
+  ✖ DATA-2       ⇈ Nightly orders job fails on NULL customer ids                                                   ● To Do          40m     
+  ✔ DATA-3       = Document lineage for the finance mart                                                           ● Done           3d      
+  ◈ DATA-4       = Migrate batch jobs from Oracle to Databricks                                                    ● In Progress    1d      
+  ◼ DATA-5       ↓ Expose freshness metrics in Grafana                                                             ● In Review      5h      
+ jt  data  DATA  My work                                                                        space menu · : cmd · ctrl+k search · ? help 

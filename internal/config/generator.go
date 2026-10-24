@@ -12,17 +12,17 @@ import (
 	"github.com/AlecAivazis/survey/v2/core"
 	"github.com/spf13/viper"
 
-	"github.com/ankitpokhrel/jira-cli/api"
-	"github.com/ankitpokhrel/jira-cli/internal/cmdutil"
-	"github.com/ankitpokhrel/jira-cli/pkg/jira"
+	"github.com/aakara-dev/jt/api"
+	"github.com/aakara-dev/jt/internal/cmdutil"
+	"github.com/aakara-dev/jt/pkg/jira"
 )
 
 const (
-	// Dir is a jira-cli config directory.
-	Dir = ".jira"
-	// FileName is a jira-cli config file name.
-	FileName = ".config"
-	// FileType is a jira-cli config file extension.
+	// Dir is the jt config directory.
+	Dir = "jt"
+	// FileName is the jt config file name.
+	FileName = "config"
+	// FileType is the jt config file extension.
 	FileType = "yml"
 
 	optionSearch = "[Search...]"
@@ -208,8 +208,8 @@ func (c *JiraCLIConfigGenerator) configureInstallationType() error {
 		qs := &survey.Select{
 			Message: "Installation type:",
 			Help:    "Is this a cloud installation or an on-premise (local) installation.",
-			Options: []string{"Cloud", "Local"},
-			Default: "Cloud",
+			Options: []string{"Local", "Cloud"},
+			Default: "Local",
 		}
 
 		var installation string
@@ -783,6 +783,10 @@ func (c *JiraCLIConfigGenerator) write(path string) (string, error) {
 		config.Set("board", "")
 	}
 
+	ctxName := DefaultProjectName(c.value.project.Key)
+	config.Set(KeyCurrentProject, ctxName)
+	config.Set(KeyProjects, map[string]any{ctxName: c.projectValue()})
+
 	if err := config.WriteConfig(); err != nil {
 		return "", err
 	}
@@ -875,4 +879,47 @@ func create(file string) error {
 	defer func() { _ = f.Close() }()
 
 	return err
+}
+
+// projectValue is what a context stores: the project-scoped part of the config.
+func (c *JiraCLIConfigGenerator) projectValue() map[string]any {
+	val := map[string]any{
+		"project": c.value.project,
+		"issue":   map[string]any{"types": c.value.issueTypes},
+	}
+	if c.value.board != nil {
+		val["board"] = c.value.board
+	} else {
+		val["board"] = ""
+	}
+	return val
+}
+
+// GenerateProject resolves a project (and optionally a board) against the
+// server and returns the value to store under contexts.<name>. Empty project
+// or board values are asked for interactively, reusing the init pickers.
+func GenerateProject(client *jira.Client, project, board string) (map[string]any, error) {
+	c := NewJiraCLIConfigGenerator(&JiraCLIConfig{Project: project, Board: board})
+	c.jiraClient = client
+	c.value.installation = viper.GetString("installation")
+	c.value.version.major = viper.GetInt("version.major")
+	c.value.version.minor = viper.GetInt("version.minor")
+	c.value.version.patch = viper.GetInt("version.patch")
+
+	if err := c.configureProjectAndBoardDetails(); err != nil {
+		return nil, err
+	}
+
+	//nolint:mnd
+	isV9Compatible := c.value.version.major >= 9 || (c.value.version.major == 8 && c.value.version.minor > 4)
+	var err error
+	if c.value.installation == jira.InstallationTypeLocal && isV9Compatible {
+		err = c.configureIssueTypesForJiraServerV9()
+	} else {
+		err = c.configureIssueTypes()
+	}
+	if err != nil {
+		return nil, err
+	}
+	return c.projectValue(), nil
 }

@@ -1,0 +1,34 @@
+ Issues · DATA (12)  project = "DATA" ORDER BY updated DESC                                                                                 
+ ◼ DATA-1       ↑ Add retry with backoff… ● In Progress    Ada Lovelace     2h      │ ◼ DATA-5  ● In Review
+ ✖ DATA-2       ⇈ Nightly orders job fai… ● To Do          Alan Turing      40m     │ Expose freshness metrics in Grafana
+ ✔ DATA-3       = Document lineage for t… ● Done           Grace Hopper     3d      │
+ ◈ DATA-4       = Migrate ba╭──────────────────────────────────────────────────────────────────────────────────╮                           
+▌◼ DATA-5       ↓ Expose fre│  comment on DATA-5                                                               │                           
+ ↳ DATA-6       = Add Delta │ ┃ Retry policy looks good, ship it.                                              │                           
+ ✖ DATA-7       ↑ dbt increm│ ┃                                                                                │                           
+ ◼ DATA-8       = Salt skewe│ ┃                                                                                │                           
+ ✔ DATA-9       ⇊ Clean up s│ ┃                                                                                │                           
+ ◼ DATA-10      ↑ Partition │ ┃                                                                                │
+ ✔ DATA-11      = Rotate ser│ ┃                                                                                │
+ ◼ DATA-12      = Backfill 2│ ┃                                                                                │
+                            │ ┃                                                                                │
+                            │ ┃                                                                                │
+                            │ ┃                                                                                │
+                            │ ┃                                                                                │
+                            │ ┃                                                                                │
+                            │ ┃                                                                                │
+                            │ ┃                                                                                │
+                            │ ┃                                                                                │
+                            │ ┃                                                                                │
+                            │ ctrl+s save · ctrl+e $EDITOR · esc cancel                                        │
+                            ╰──────────────────────────────────────────────────────────────────────────────────╯
+                                                                                    │
+                                                                                    │
+                                                                                    │
+                                                                                    │
+                                                                                    │
+                                                                                    │
+                                                                                    │
+                                                                                    │
+                                                                                    │
+ jt  data  DATA  Issues · DATA                                                                  space menu · : cmd · ctrl+k search · ? help 

@@ -14,10 +14,13 @@ import (
 	"github.com/spf13/viper"
 	"golang.org/x/term"
 
-	"github.com/ankitpokhrel/jira-cli/pkg/browser"
-	"github.com/ankitpokhrel/jira-cli/pkg/jira"
-	"github.com/ankitpokhrel/jira-cli/pkg/tui"
+	"github.com/aakara-dev/jt/pkg/browser"
+	"github.com/aakara-dev/jt/pkg/jira"
+	"github.com/aakara-dev/jt/pkg/tui"
 )
+
+// SkipTokenAnnotation marks commands that work without a Jira API token.
+const SkipTokenAnnotation = "jt/skip-token"
 
 // ExitIfError exists with error message if err is not nil.
 func ExitIfError(err error) {
@@ -90,7 +93,7 @@ func Failed(msg string, args ...interface{}) {
 	os.Exit(1)
 }
 
-// Navigate navigates to jira issue.
+// Navigate navigates to jt issue.
 func Navigate(server, path string) error {
 	url := GenerateServerBrowseURL(server, path)
 	return browser.Browse(url)
@@ -167,7 +170,7 @@ func NormalizeJiraError(msg string) string {
 
 // GetSubtaskHandle fetches actual subtask handle.
 // This value can either be handle or name based
-// on the used jira version.
+// on the used jt version.
 func GetSubtaskHandle(issueType string, issueTypes []*jira.IssueType) string {
 	get := func(it *jira.IssueType) string {
 		if it.Handle != "" {

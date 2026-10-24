@@ -13,7 +13,8 @@ import (
 	"github.com/mattn/go-isatty"
 	"github.com/rivo/tview"
 
-	"github.com/ankitpokhrel/jira-cli/pkg/tui/primitive"
+	"github.com/aakara-dev/jt/pkg/env"
+	"github.com/aakara-dev/jt/pkg/tui/primitive"
 )
 
 func pad(in string, n uint) string {
@@ -89,7 +90,7 @@ func GetPager() string {
 	if IsDumbTerminal() {
 		return "cat"
 	}
-	pager := os.Getenv("JIRA_PAGER")
+	pager := env.Get("PAGER")
 	if pager == "" {
 		pgr := os.Getenv("PAGER")
 		if pgr == "" {

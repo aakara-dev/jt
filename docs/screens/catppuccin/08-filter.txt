@@ -1,0 +1,34 @@
+ Issues · DATA (3/12)  project = "DATA" ORDER BY updated DESC                                                                               
+▌✖ DATA-2       ⇈ Nightly orders job fai… ● To Do          Alan Turing      40m     │ ✖ DATA-2  ● To Do                                     
+ ◼ DATA-1       ↑ Add retry with backoff… ● In Progress    Ada Lovelace     2h      │ Nightly orders job fails on NULL customer ids         
+ ✔ DATA-3       = Document lineage for t… ● Done           Grace Hopper     3d      │                                                       
+                                                                                    │ Type      Bug                                         
+                                                                                    │ Priority  Highest                                     
+                                                                                    │ Assignee  Alan Turing                                 
+                                                                                    │ Reporter  Grace Hopper                                
+                                                                                    │ Labels    bug, orders                                 
+                                                                                    │ Updated   40m ago                                     
+                                                                                    │                                                       
+                                                                                    │ ───────────────────────────────────────────────────── 
+                                                                                    │                                                       
+                                                                                    │   Spark job aborts when {{customer_id}} is NULL       
+                                                                                    │   in the source extract.                              
+                                                                                    │                                                       
+                                                                                    │                                                       
+                                                                                    │                                                       
+                                                                                    │                                                       
+                                                                                    │                                                       
+                                                                                    │                                                       
+                                                                                    │                                                       
+                                                                                    │                                                       
+                                                                                    │                                                       
+                                                                                    │                                                       
+                                                                                    │                                                       
+                                                                                    │                                                       
+                                                                                    │                                                       
+                                                                                    │                                                       
+                                                                                    │                                                       
+                                                                                    │                                                       
+                                                                                    │                                                       
+/orders                                                                                                                                     
+ jt  data  DATA  Issues · DATA                                                                  space menu · : cmd · ctrl+k search · ? help 

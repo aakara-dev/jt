@@ -11,27 +11,27 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	"github.com/ankitpokhrel/jira-cli/api"
-	"github.com/ankitpokhrel/jira-cli/internal/cmdutil"
-	"github.com/ankitpokhrel/jira-cli/internal/query"
-	"github.com/ankitpokhrel/jira-cli/pkg/jira"
+	"github.com/aakara-dev/jt/api"
+	"github.com/aakara-dev/jt/internal/cmdutil"
+	"github.com/aakara-dev/jt/internal/query"
+	"github.com/aakara-dev/jt/pkg/jira"
 )
 
 const (
 	helpText = `Assign issue to a user.`
-	examples = `$ jira issue assign ISSUE-1 jon@domain.tld
+	examples = `$ jt issue assign ISSUE-1 jon@domain.tld
 
 # Assignee name or email needs to be an exact match
-$ jira issue assign ISSUE-1 "Jon Doe"
+$ jt issue assign ISSUE-1 "Jon Doe"
 
 # Assign to self
-$ jira issue assign ISSUE-1 $(jira me)
+$ jt issue assign ISSUE-1 $(jt me)
 
 # Assign to default assignee
-$ jira issue assign ISSUE-1 default
+$ jt issue assign ISSUE-1 default
 
 # Unassign
-$ jira issue assign ISSUE-1 x`
+$ jt issue assign ISSUE-1 x`
 
 	maxResults = 100
 	lineBreak  = "----------"
@@ -49,7 +49,7 @@ func NewCmdAssign() *cobra.Command {
 		Short:   "Assign issue to a user",
 		Long:    helpText,
 		Example: examples,
-		Aliases: []string{"asg"},
+		Aliases: []string{"asg", "a"},
 		Annotations: map[string]string{
 			"help:args": `ISSUE-KEY	Issue key, eg: ISSUE-1
 ASSIGNEE	Email or display name of the user to assign the issue to`,

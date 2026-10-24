@@ -8,28 +8,29 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	"github.com/ankitpokhrel/jira-cli/api"
-	"github.com/ankitpokhrel/jira-cli/internal/cmdutil"
-	"github.com/ankitpokhrel/jira-cli/internal/query"
-	"github.com/ankitpokhrel/jira-cli/pkg/adf"
-	"github.com/ankitpokhrel/jira-cli/pkg/jira"
+	"github.com/aakara-dev/jt/api"
+	"github.com/aakara-dev/jt/internal/cmdutil"
+	"github.com/aakara-dev/jt/internal/query"
+	"github.com/aakara-dev/jt/pkg/adf"
+	"github.com/aakara-dev/jt/pkg/jira"
 )
 
 const (
 	helpText = `Clone duplicates an issue and also allow you to override some of the metadata when doing so.`
-	examples = `$ jira issue clone ISSUE-1
+	examples = `$ jt issue clone ISSUE-1
 
 # Clone issue and modify the summary, priority and assignee
-$ jira issue clone ISSUE-1 -s"Modified summary" -yHigh -a$(jira me)
+$ jt issue clone ISSUE-1 -s"Modified summary" -yHigh -a$(jt me)
 
 # Clone issue and replace text from summary and description
-$ jira issue clone ISSUE-1 -H"find me:replace with me"`
+$ jt issue clone ISSUE-1 -H"find me:replace with me"`
 )
 
 // NewCmdClone is a clone command.
 func NewCmdClone() *cobra.Command {
 	cmd := cobra.Command{
 		Use:     "clone ISSUE-KEY",
+		Aliases: []string{"cp"},
 		Short:   "Clone duplicates an issue",
 		Long:    helpText,
 		Example: examples,

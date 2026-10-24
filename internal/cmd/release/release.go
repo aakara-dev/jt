@@ -3,7 +3,7 @@ package release
 import (
 	"github.com/spf13/cobra"
 
-	"github.com/ankitpokhrel/jira-cli/internal/cmd/release/list"
+	"github.com/aakara-dev/jt/internal/cmd/release/list"
 )
 
 const helpText = `Release manages Jira Project versions. See available commands below.`
@@ -15,7 +15,7 @@ func NewCmdRelease() *cobra.Command {
 		Short:       "Release manages Jira Project versions",
 		Long:        helpText,
 		Annotations: map[string]string{"cmd:main": "true"},
-		Aliases:     []string{"releases"},
+		Aliases:     []string{"releases", "rel"},
 		RunE:        releases,
 	}
 

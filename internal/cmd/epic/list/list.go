@@ -7,13 +7,13 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	"github.com/ankitpokhrel/jira-cli/api"
-	"github.com/ankitpokhrel/jira-cli/internal/cmd/issue/list"
-	"github.com/ankitpokhrel/jira-cli/internal/cmdutil"
-	"github.com/ankitpokhrel/jira-cli/internal/query"
-	"github.com/ankitpokhrel/jira-cli/internal/view"
-	"github.com/ankitpokhrel/jira-cli/pkg/jira"
-	"github.com/ankitpokhrel/jira-cli/pkg/tui"
+	"github.com/aakara-dev/jt/api"
+	"github.com/aakara-dev/jt/internal/cmd/issue/list"
+	"github.com/aakara-dev/jt/internal/cmdutil"
+	"github.com/aakara-dev/jt/internal/query"
+	"github.com/aakara-dev/jt/internal/view"
+	"github.com/aakara-dev/jt/pkg/jira"
+	"github.com/aakara-dev/jt/pkg/tui"
 )
 
 const (
@@ -23,23 +23,23 @@ By default epics are displayed in an explorer view. You can use --table
 and --plain flags to display output in different modes.`
 
 	examples = `# Display epics in an explorer view
-$ jira epic list
+$ jt epic list
 
 # Display epics or epic issues in an interactive table view
-$ jira epic list --table
-$ jira epic list <KEY>
+$ jt epic list --table
+$ jt epic list <KEY>
 
 # Display epics or epic issues in a plain table view
-$ jira epic list --table --plain
-$ jira epic list <KEY> --plain
+$ jt epic list --table --plain
+$ jt epic list <KEY> --plain
 
 # Display epics or epic issues in a plain table view without headers
-$ jira epic list --table --plain --no-headers
-$ jira epic list <KEY> --plain --no-headers
+$ jt epic list --table --plain --no-headers
+$ jt epic list <KEY> --plain --no-headers
 
 # Display some columns of epic or epic issues in a plain table view
-$ jira epic list --table --plain --columns key,summary,status
-$ jira epic list <KEY> --plain --columns type,key,summary`
+$ jt epic list --table --plain --columns key,summary,status
+$ jt epic list <KEY> --plain --columns type,key,summary`
 )
 
 // NewCmdList is a list command.

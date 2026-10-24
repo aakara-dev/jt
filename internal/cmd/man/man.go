@@ -8,11 +8,11 @@ import (
 )
 
 const (
-	examples = `# Generate man pages in default location /tmp/man-jira-cli
-$ jira man --generate
+	examples = `# Generate man pages in default location /tmp/man-jt
+$ jt man --generate
 
 # Generate man pages in specified location
-$ jira man --generate --output /path/to/man-pages`
+$ jt man --generate --output /path/to/man-pages`
 )
 
 // NewCmdMan is a man command.
@@ -26,7 +26,7 @@ func NewCmdMan() *cobra.Command {
 	}
 
 	cmd.Flags().BoolP("generate", "g", false, "Generate the man pages for Jira CLI")
-	cmd.Flags().StringP("output", "o", "/tmp/man-jira-cli", "Name of the directory where the man pages would be generated")
+	cmd.Flags().StringP("output", "o", "/tmp/man-jt", "Name of the directory where the man pages would be generated")
 
 	return &cmd
 }

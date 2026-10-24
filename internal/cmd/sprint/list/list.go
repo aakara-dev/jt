@@ -9,13 +9,13 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	"github.com/ankitpokhrel/jira-cli/api"
-	"github.com/ankitpokhrel/jira-cli/internal/cmd/issue/list"
-	"github.com/ankitpokhrel/jira-cli/internal/cmdutil"
-	"github.com/ankitpokhrel/jira-cli/internal/query"
-	"github.com/ankitpokhrel/jira-cli/internal/view"
-	"github.com/ankitpokhrel/jira-cli/pkg/jira"
-	"github.com/ankitpokhrel/jira-cli/pkg/tui"
+	"github.com/aakara-dev/jt/api"
+	"github.com/aakara-dev/jt/internal/cmd/issue/list"
+	"github.com/aakara-dev/jt/internal/cmdutil"
+	"github.com/aakara-dev/jt/internal/query"
+	"github.com/aakara-dev/jt/internal/view"
+	"github.com/aakara-dev/jt/pkg/jira"
+	"github.com/aakara-dev/jt/pkg/tui"
 )
 
 const (
@@ -24,26 +24,26 @@ const (
 Sprints are displayed in an explorer view by default. You can use --table
 and --plain flags to display output in different modes.`
 
-	examples = `$ jira sprint list
+	examples = `$ jt sprint list
 
 # Display sprints or sprint issues in an interactive list
-$ jira sprint list --table
-$ jira sprint list <SPRINT_ID> --table
+$ jt sprint list --table
+$ jt sprint list <SPRINT_ID> --table
 
 # Display sprints or sprint issues in a plain table view
-$ jira sprint list --table --plain
-$ jira sprint list <SPRINT_ID> --plain
+$ jt sprint list --table --plain
+$ jt sprint list <SPRINT_ID> --plain
 
 # Display sprints or sprint issues in a plain table view without headers
-$ jira sprint list --table --plain --no-headers
-$ jira sprint list <SPRINT_ID> --no-headers
+$ jt sprint list --table --plain --no-headers
+$ jt sprint list <SPRINT_ID> --no-headers
 
 # Display some columns of sprint or sprint issues in a plain table view
-$ jira sprint list --table --plain --columns name,start,end
-$ jira sprint list <SPRINT_ID> --plain --columns type,key,summary
+$ jt sprint list --table --plain --columns name,start,end
+$ jt sprint list <SPRINT_ID> --plain --columns type,key,summary
 
 # Display sprint issues in a plain table view and show all fields
-$ jira sprint list <SPRINT_ID> --plain --no-truncate`
+$ jt sprint list <SPRINT_ID> --plain --no-truncate`
 )
 
 // NewCmdList is a sprint list command.

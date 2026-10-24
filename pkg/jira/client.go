@@ -180,7 +180,7 @@ func NewClient(c Config, opts ...ClientFunc) *Client {
 	}
 
 	if c.AuthType != nil && *c.AuthType == AuthTypeCFAccess {
-		token.Init("jira-cli")
+		token.Init("jt")
 		tempAccessURL, err := url.Parse(c.Server)
 		if err != nil {
 			log.Fatalf("failed to parse server URL: %v", err)

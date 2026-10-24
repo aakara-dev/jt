@@ -1,5 +1,5 @@
 version: 2
-project_name: jira
+project_name: jt
 
 release:
   prerelease: auto
@@ -13,13 +13,13 @@ before:
 
 builds:
   - <<: &build_defaults
-      binary: bin/jira
-      main: ./cmd/jira
+      binary: bin/jt
+      main: ./cmd/jt
       ldflags:
         - -s -w
-        - -X github.com/ankitpokhrel/jira-cli/internal/version.Version={{.Version}}
-        - -X github.com/ankitpokhrel/jira-cli/internal/version.GitCommit={{.FullCommit}}
-        - -X github.com/ankitpokhrel/jira-cli/internal/version.SourceDateEpoch={{.CommitTimestamp}}
+        - -X github.com/aakara-dev/jt/internal/version.Version={{.Version}}
+        - -X github.com/aakara-dev/jt/internal/version.GitCommit={{.FullCommit}}
+        - -X github.com/aakara-dev/jt/internal/version.SourceDateEpoch={{.CommitTimestamp}}
       env:
         - CGO_ENABLED=0
     id: macOS
@@ -60,40 +60,40 @@ checksum:
   algorithm: sha256
 
 brews:
-  - name: jira-cli
-    homepage: "https://github.com/ankitpokhrel/jira-cli"
-    description: "🔥 Feature-rich interactive Jira command-line"
+  - name: jt
+    homepage: "https://github.com/aakara-dev/jt"
+    description: "Keyboard-driven Jira Server/Data Center TUI and CLI"
     license: "MIT"
 
     ids:
       - nix
 
     repository:
-      owner: ankitpokhrel
-      name: homebrew-jira-cli
+      owner: aakara-dev
+      name: homebrew-tap
 
     custom_block: |
       head do
-        url "https://github.com/ankitpokhrel/jira-cli.git", branch: "main"
+        url "https://github.com/aakara-dev/jt.git", branch: "main"
         depends_on "go"
       end
 
     install: |
       if build.head?
         system "make", "install"
-        bin.install ENV["GOPATH"] + "/bin/jira"
+        bin.install ENV["GOPATH"] + "/bin/jt"
       else
-        bin.install File.exist?("bin/jira") ? "bin/jira" : "jira"
+        bin.install File.exist?("bin/jira") ? "bin/jt" : "jt"
       end
-      generate_completions_from_executable(bin/"jira", "completion", shells: [:bash, :zsh, :fish])
+      generate_completions_from_executable(bin/"jt", "completion", shells: [:bash, :zsh, :fish])
 
     test: |
-      help_text = shell_output("#{bin}/jira version")
+      help_text = shell_output("#{bin}/jt version")
       assert_includes help_text, "Version=\"#{version}\""
 
     commit_author:
-      name: ankitpokhrel
-      email: oss@ankit.pl
+      name: aakara-dev
+      email: aakara.dev@gmail.com
 
     commit_msg_template: "Formula update for version {{ .Tag }}"
 

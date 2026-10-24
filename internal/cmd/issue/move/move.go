@@ -9,16 +9,16 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	"github.com/ankitpokhrel/jira-cli/api"
-	"github.com/ankitpokhrel/jira-cli/internal/cmdutil"
-	"github.com/ankitpokhrel/jira-cli/internal/query"
-	"github.com/ankitpokhrel/jira-cli/pkg/jira"
+	"github.com/aakara-dev/jt/api"
+	"github.com/aakara-dev/jt/internal/cmdutil"
+	"github.com/aakara-dev/jt/internal/query"
+	"github.com/aakara-dev/jt/pkg/jira"
 )
 
 const (
 	helpText = `Move transitions an issue from one state to another.`
-	examples = `$ jira issue move ISSUE-1 "In Progress"
-$ jira issue move ISSUE-1 Done`
+	examples = `$ jt issue move ISSUE-1 "In Progress"
+$ jt issue move ISSUE-1 Done`
 
 	optionCancel = "Cancel"
 )

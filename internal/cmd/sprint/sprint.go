@@ -3,9 +3,9 @@ package sprint
 import (
 	"github.com/spf13/cobra"
 
-	"github.com/ankitpokhrel/jira-cli/internal/cmd/sprint/add"
-	"github.com/ankitpokhrel/jira-cli/internal/cmd/sprint/close"
-	"github.com/ankitpokhrel/jira-cli/internal/cmd/sprint/list"
+	"github.com/aakara-dev/jt/internal/cmd/sprint/add"
+	"github.com/aakara-dev/jt/internal/cmd/sprint/close"
+	"github.com/aakara-dev/jt/internal/cmd/sprint/list"
 )
 
 const helpText = `Sprint manage sprints in a project board. See available commands below.`
@@ -16,7 +16,7 @@ func NewCmdSprint() *cobra.Command {
 		Use:         "sprint",
 		Short:       "Sprint manage sprints in a project board",
 		Long:        helpText,
-		Aliases:     []string{"sprints"},
+		Aliases:     []string{"sprints", "sp"},
 		Annotations: map[string]string{"cmd:main": "true"},
 		RunE:        sprint,
 	}

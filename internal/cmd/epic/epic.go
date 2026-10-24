@@ -3,10 +3,10 @@ package epic
 import (
 	"github.com/spf13/cobra"
 
-	"github.com/ankitpokhrel/jira-cli/internal/cmd/epic/add"
-	"github.com/ankitpokhrel/jira-cli/internal/cmd/epic/create"
-	"github.com/ankitpokhrel/jira-cli/internal/cmd/epic/list"
-	"github.com/ankitpokhrel/jira-cli/internal/cmd/epic/remove"
+	"github.com/aakara-dev/jt/internal/cmd/epic/add"
+	"github.com/aakara-dev/jt/internal/cmd/epic/create"
+	"github.com/aakara-dev/jt/internal/cmd/epic/list"
+	"github.com/aakara-dev/jt/internal/cmd/epic/remove"
 )
 
 const helpText = `Epic manage epics in a given project. See available commands below.`
@@ -17,7 +17,7 @@ func NewCmdEpic() *cobra.Command {
 		Use:         "epic",
 		Short:       "Epic manage epics in a project",
 		Long:        helpText,
-		Aliases:     []string{"epics"},
+		Aliases:     []string{"epics", "ep"},
 		Annotations: map[string]string{"cmd:main": "true"},
 		RunE:        epic,
 	}

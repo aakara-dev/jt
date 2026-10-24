@@ -8,10 +8,11 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	"github.com/ankitpokhrel/jira-cli/internal/cmdutil"
-	jiraConfig "github.com/ankitpokhrel/jira-cli/internal/config"
-	"github.com/ankitpokhrel/jira-cli/internal/query"
-	"github.com/ankitpokhrel/jira-cli/pkg/jira"
+	"github.com/aakara-dev/jt/internal/cmdutil"
+	jiraConfig "github.com/aakara-dev/jt/internal/config"
+	"github.com/aakara-dev/jt/internal/query"
+	"github.com/aakara-dev/jt/pkg/env"
+	"github.com/aakara-dev/jt/pkg/jira"
 )
 
 type initParams struct {
@@ -65,7 +66,7 @@ func parseFlags(flags query.FlagParser) *initParams {
 
 	// If auth type is not provided, check if it's set in env.
 	if authType == "" {
-		authType = os.Getenv("JIRA_AUTH_TYPE")
+		authType = env.Get("AUTH_TYPE")
 	}
 	authType = strings.ToLower(authType)
 

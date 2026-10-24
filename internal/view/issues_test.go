@@ -6,8 +6,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/ankitpokhrel/jira-cli/pkg/jira"
-	"github.com/ankitpokhrel/jira-cli/pkg/tui"
+	"github.com/aakara-dev/jt/pkg/jira"
+	"github.com/aakara-dev/jt/pkg/tui"
 )
 
 func TestIssueData(t *testing.T) {
@@ -210,9 +210,7 @@ func getIssues() []*jira.Issue {
 				Reporter: struct {
 					Name string `json:"displayName"`
 				}{Name: "Person Z"},
-				Status: struct {
-					Name string `json:"name"`
-				}{Name: "Done"},
+				Status:  jira.IssueStatus{Name: "Done"},
 				Created: "2020-12-13T14:05:20.974+0100",
 				Updated: "2020-12-13T14:07:20.974+0100",
 				Labels:  []string{"krakatit"},
@@ -229,9 +227,7 @@ func getIssues() []*jira.Issue {
 				Reporter: struct {
 					Name string `json:"displayName"`
 				}{Name: "Person A"},
-				Status: struct {
-					Name string `json:"name"`
-				}{Name: "Open"},
+				Status:  jira.IssueStatus{Name: "Open"},
 				Created: "2020-12-13T14:05:20.974+0100",
 				Updated: "2020-12-13T14:07:20.974+0100",
 				Labels:  []string{"pat", "mat"},
