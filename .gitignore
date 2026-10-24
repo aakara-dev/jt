@@ -14,3 +14,6 @@ vendor/
 /.gocache
 
 .vscode/
+
+# ~/.gitignore_global may ignore env/ (virtualenvs); this one is Go source.
+!pkg/env/
