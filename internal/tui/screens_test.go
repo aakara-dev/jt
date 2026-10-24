@@ -134,6 +134,15 @@ func TestScreens(t *testing.T) {
 	h.send(key("l"))
 	h.send(key("j"))
 	snap(h, "17-board-nav", "Board navigation (h/l columns, j/k cards, H/L move)")
+	h.send(key("S"))
+	snap(h, "18-board-stats", "Sprint stats (S on the board)")
+	h.send(key("esc"))
+
+	h.send(runCommandMsg{"home"})
+	snap(h, "00-home", "My work dashboard (start screen)")
+
+	h.send(runCommandMsg{"epics"})
+	snap(h, "19-epics", "Epics with progress (:epics)")
 
 	var page strings.Builder
 	page.WriteString(`<!doctype html><html><head><meta charset="utf-8"><title>jt screens</title><style>
@@ -233,8 +242,10 @@ func ansiToHTML(s string) string {
 			open = true
 		}
 	}
-	basic := []string{"#15161e", "#f7768e", "#9ece6a", "#e0af68", "#7aa2f7", "#bb9af7", "#7dcfff", "#a9b1d6",
-		"#414868", "#f7768e", "#9ece6a", "#e0af68", "#7aa2f7", "#bb9af7", "#7dcfff", "#c0caf5"}
+	basic := []string{
+		"#15161e", "#f7768e", "#9ece6a", "#e0af68", "#7aa2f7", "#bb9af7", "#7dcfff", "#a9b1d6",
+		"#414868", "#f7768e", "#9ece6a", "#e0af68", "#7aa2f7", "#bb9af7", "#7dcfff", "#c0caf5",
+	}
 	color256 := func(n int) string {
 		switch {
 		case n < 16:

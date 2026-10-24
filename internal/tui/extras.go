@@ -70,7 +70,8 @@ func countBy(columns []*boardColumn, key func(*jira.Issue) string) []tally {
 func (p statsPopup) Render(st styles, width, _ int) string {
 	barW := 20
 	section := func(title string, rows []tally) string {
-		lines := []string{st.Accent2.Bold(true).Render(title)}
+		lines := make([]string, 0, len(rows)+1)
+		lines = append(lines, st.Accent2.Bold(true).Render(title))
 		nameW := 0
 		for _, r := range rows {
 			nameW = max(nameW, lipgloss.Width(r.name))
@@ -82,7 +83,7 @@ func (p statsPopup) Render(st styles, width, _ int) string {
 		return strings.Join(lines, "\n")
 	}
 
-	var cols []tally
+	cols := make([]tally, 0, len(p.columns))
 	total, done := 0, 0
 	for ci, c := range p.columns {
 		t := tally{name: c.name, total: len(c.issues)}

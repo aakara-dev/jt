@@ -29,6 +29,8 @@ $ jt find '@me' --limit 10
 $ jt find '!orders' -i      # open the results in the floating search
 $ jt find '>status = Blocked' --jql`
 
+const defaultLimit = 25
+
 // NewCmdFind is the find command.
 func NewCmdFind() *cobra.Command {
 	cmd := cobra.Command{
@@ -41,7 +43,7 @@ func NewCmdFind() *cobra.Command {
 		RunE:    run,
 	}
 	cmd.Flags().BoolP("interactive", "i", false, "Open the floating search in the UI")
-	cmd.Flags().UintP("limit", "n", 25, "Maximum number of results")
+	cmd.Flags().UintP("limit", "n", defaultLimit, "Maximum number of results")
 	cmd.Flags().Bool("jql", false, "Print the generated JQL instead of searching")
 	return &cmd
 }

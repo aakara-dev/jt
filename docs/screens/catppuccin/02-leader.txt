@@ -7,18 +7,18 @@
  ↳ DATA-6       = Ad╭──────────────────────────────────────────────────────────────────────────────────────────────────╮                   
  ✖ DATA-7       ↑ db│  <leader>                                                                                        │                   
  ◼ DATA-8       = Sa│ Find                    Lists                   Project                 App                      │                   
- ✔ DATA-9       ⇊ Cl│ /  → search             b  → board (kanban)     p  → switch project     ?  → help                │                   
- ◼ DATA-10      ↑ Pa│ k  → jump to issue key  i  → issues             -  → previous project   q  → quit                │
- ✔ DATA-11      = Ro│ j  → JQL query          m  → assigned to me     t  → theme                                       │───────────────────
- ◼ DATA-12      = Ba│ f  → saved filters      s  → active sprint                                                       │
+ ✔ DATA-9       ⇊ Cl│ /  → search             h  → my work dashboard  p  → switch project     ?  → help                │                   
+ ◼ DATA-10      ↑ Pa│ k  → jump to issue key  b  → board (kanban)     -  → previous project   q  → quit                │
+ ✔ DATA-11      = Ro│ j  → JQL query          i  → issues             t  → theme                                       │───────────────────
+ ◼ DATA-12      = Ba│ f  → saved filters      m  → assigned to me                                                      │
+                    │                         s  → active sprint                                                       │               
                     │                         B  → backlog                                                             │               
-                    │                         e  → epics                                                               │               
-                    │                         r  → recently viewed                                                     │ transient ADLS
+                    │                         e  → epics                                                               │ transient ADLS
+                    │                         r  → recently viewed                                                     │               
                     │                         w  → watching                                                            │               
                     │                         u  → updated today                                                       │               
                     │ press a key · esc close                                                                          │               
-                    ╰──────────────────────────────────────────────────────────────────────────────────────────────────╯               
-                                                                                    │   • retries 3x with exponential backoff          
+                    ╰──────────────────────────────────────────────────────────────────────────────────────────────────╯ckoff          
                                                                                     │   • logs row counts per partition                
                                                                                     │   • idempotent on rerun                          
                                                                                     │

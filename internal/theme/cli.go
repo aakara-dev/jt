@@ -25,10 +25,10 @@ func Table(w io.Writer, s Styles, headers []string, rows [][]string, highlight i
 		Headers(headers...).
 		Rows(rows...).
 		StyleFunc(func(row, _ int) lipgloss.Style {
-			switch {
-			case row == table.HeaderRow:
+			switch row {
+			case table.HeaderRow:
 				return s.Header.PaddingRight(gap)
-			case row == highlight:
+			case highlight:
 				return s.Selected.PaddingRight(gap)
 			default:
 				return s.Value.PaddingRight(gap)

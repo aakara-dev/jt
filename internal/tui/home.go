@@ -193,11 +193,10 @@ func (v *homeView) jumpSection(forward bool) {
 
 func (v *homeView) Render(width, height int) string {
 	st := *v.st
-	sel := v.Selected()
 	summaryW := max(width-(4+colKey+colStatus+colUpdated+8), 10)
 
 	var lines []string
-	selLine := 0
+	selLine, row := 0, 0
 	for _, sec := range v.sections {
 		count := ""
 		switch {
@@ -225,13 +224,15 @@ func (v *homeView) Render(width, height int) string {
 				fit(st.statusBadge(f.Status), colStatus),
 				st.Muted.Render(fit(ago(f.Updated), colUpdated)),
 			}, " ")
-			if sel != nil && iss == sel {
+			// Compare by row, not issue: one issue can sit in several sections.
+			if row == v.cursor {
 				selLine = len(lines)
 				line = st.RowSelected.Width(width).Render(" ▌" + ansiStrip(line))
 			} else {
 				line = "  " + line
 			}
 			lines = append(lines, line)
+			row++
 		}
 		lines = append(lines, "")
 	}

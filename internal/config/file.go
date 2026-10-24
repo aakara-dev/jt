@@ -16,6 +16,13 @@ import (
 	"github.com/aakara-dev/jt/pkg/env"
 )
 
+// The config sits next to credential settings (netrc/keyring references),
+// so it is private to the user.
+const (
+	filePerm = 0o600
+	dirPerm  = 0o700
+)
+
 // ErrNoConfig is returned when no config file exists at the resolved path.
 var ErrNoConfig = errors.New("config file not found, run 'jt init' to create one")
 
@@ -176,7 +183,7 @@ func (f *File) Save() error {
 	}
 	out := buf.Bytes()
 	dir := filepath.Dir(f.path)
-	if err := os.MkdirAll(dir, 0o700); err != nil {
+	if err := os.MkdirAll(dir, dirPerm); err != nil {
 		return err
 	}
 	tmp, err := os.CreateTemp(dir, ".config-*.yml")
@@ -189,7 +196,7 @@ func (f *File) Save() error {
 		_ = tmp.Close()
 		return err
 	}
-	if err := tmp.Chmod(0o600); err != nil {
+	if err := tmp.Chmod(filePerm); err != nil {
 		_ = tmp.Close()
 		return err
 	}

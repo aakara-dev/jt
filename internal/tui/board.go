@@ -52,7 +52,6 @@ type boardView struct {
 	col, row int
 	loading  bool
 	err      error
-	height   int
 }
 
 func newBoardView(boardID int, b Backend, st *styles) *boardView {

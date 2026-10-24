@@ -413,8 +413,9 @@ func (a *App) projectPicker() tea.Cmd {
 }
 
 func (a *App) themePicker() tea.Cmd {
-	var items []pickItem
-	for _, n := range theme.Names() {
+	names := theme.Names()
+	items := make([]pickItem, 0, len(names))
+	for _, n := range names {
 		items = append(items, pickItem{Label: n, Value: n})
 	}
 	a.popup = newPicker("theme", items, func(it pickItem) tea.Cmd { return a.setTheme(it.Value) }).cursorTo(theme.Get(a.sess.Theme).Name)
@@ -435,7 +436,8 @@ func (a *App) setTheme(name string) tea.Cmd {
 
 // completions feeds the ":" prompt.
 func (a *App) completions(input string) []string {
-	cands := []string{"home", "export csv", "export md", "project", "board", "theme", "search", "query", "save", "epic", "open", "help", "quit", "project -"}
+	cands := make([]string, 0, 64)
+	cands = append(cands, "home", "export csv", "export md", "project", "board", "theme", "search", "query", "save", "epic", "open", "help", "quit", "project -")
 	cands = append(cands, BuiltinListNames...)
 	for _, c := range a.sess.Projects {
 		cands = append(cands, "project "+c.Name)
@@ -482,7 +484,7 @@ func (a *App) statusBar() string {
 	if a.sess.Project != "" {
 		left += st.StatusDim.Render(a.sess.Project)
 	}
-	var crumbs []string
+	crumbs := make([]string, 0, len(a.stack))
 	for _, v := range a.stack {
 		crumbs = append(crumbs, v.Title())
 	}

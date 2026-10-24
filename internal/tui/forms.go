@@ -86,7 +86,7 @@ type asyncPicker struct {
 
 func newAsyncPicker(title string, fixed []pickItem, source func(string) ([]pickItem, error), onSelect func(pickItem) tea.Cmd) (*asyncPicker, tea.Cmd) {
 	p := &asyncPicker{picker: newPicker(title, fixed, onSelect), source: source}
-	p.picker.input.Placeholder = "type to search"
+	p.input.Placeholder = "type to search"
 	return p, p.query()
 }
 
@@ -103,7 +103,7 @@ func (p *asyncPicker) Update(msg tea.Msg) (Popup, tea.Cmd) {
 			return p, nil
 		}
 		p.loading = true
-		q, src, seq := p.picker.input.Value(), p.source, p.seq
+		q, src, seq := p.input.Value(), p.source, p.seq
 		return p, func() tea.Msg {
 			items, err := src(q)
 			return asyncItemsMsg{seq, items, err}
@@ -113,18 +113,18 @@ func (p *asyncPicker) Update(msg tea.Msg) (Popup, tea.Cmd) {
 			return p, nil
 		}
 		p.loading, p.err = false, msg.err
-		p.picker.items = msg.items
-		p.picker.input.SetValue(p.picker.input.Value()) // keep the query
-		p.picker.matches = p.picker.matches[:0]
-		for i := range p.picker.items {
-			p.picker.matches = append(p.picker.matches, i)
+		p.items = msg.items
+		p.input.SetValue(p.input.Value()) // keep the query
+		p.matches = p.matches[:0]
+		for i := range p.items {
+			p.matches = append(p.matches, i)
 		}
-		p.picker.cursor = 0
+		p.cursor = 0
 		return p, nil
 	case tea.KeyPressMsg:
-		before := p.picker.input.Value()
+		before := p.input.Value()
 		_, cmd := p.picker.Update(msg)
-		if p.picker.input.Value() != before {
+		if p.input.Value() != before {
 			return p, tea.Batch(cmd, p.query())
 		}
 		return p, cmd
@@ -133,15 +133,15 @@ func (p *asyncPicker) Update(msg tea.Msg) (Popup, tea.Cmd) {
 }
 
 func (p *asyncPicker) Render(st styles, width, height int) string {
-	title := p.picker.title
+	title := p.title
 	switch {
 	case p.loading:
-		p.picker.title = title + " ⟳"
+		p.title = title + " ⟳"
 	case p.err != nil:
-		p.picker.title = title + " ✖ " + p.err.Error()
+		p.title = title + " ✖ " + p.err.Error()
 	}
 	out := p.picker.Render(st, width, height)
-	p.picker.title = title
+	p.title = title
 	return out
 }
 
@@ -414,7 +414,7 @@ func (f *formPopup) Render(st styles, width, height int) string {
 	}
 	fieldW := inner - labelW - 3
 
-	var rows []string
+	rows := make([]string, 0, len(f.fields))
 	for i, ff := range f.fields {
 		label := ff.label
 		if ff.required {

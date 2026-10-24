@@ -265,10 +265,7 @@ func labelDiff(old, updated []string) []string {
 	for _, l := range updated {
 		has[l] = true
 	}
-	var out []string
-	for _, l := range updated {
-		out = append(out, l)
-	}
+	out := append([]string(nil), updated...)
 	for _, l := range old {
 		if !has[l] {
 			out = append(out, "-"+l)

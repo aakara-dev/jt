@@ -1,0 +1,38 @@
+# ~/.config/jt/config.yml — created by `jt init`, edited by `jt project`,
+# `jt alias` and the TUI. Secrets never go here: export JT_API_TOKEN, use
+# ~/.netrc, or store the token in the OS keyring under the service "jt".
+
+server: https://jira.example.com
+login: aakara
+installation: Local          # Jira Server / Data Center
+auth_type: bearer            # bearer (PAT) or basic
+
+# Saved projects: switch with `jt project NAME`, ctrl+p in the UI, or run a
+# single command elsewhere with `-p NAME`. `jt project add` fills these in.
+current_project: data
+projects:
+  data:
+    project: {key: DATA, type: classic}
+    board: {id: 142, name: Data Platform, type: scrum}
+  ops:
+    project: {key: OPS, type: classic}
+    board: {id: 77, name: Ops Kanban, type: kanban}
+
+# Command aliases (`jt alias set NAME EXPANSION`). {me} {project} {board},
+# $1..$N, and !shell commands are supported. Empty values disable defaults.
+aliases:
+  blocked: issue list -s Blocked --order-by updated
+  start: issue move $1 "In Progress"
+  mine: ""
+
+# Named JQL for `:query NAME`, `*name` in search and `jt find '*name'`.
+saved_queries:
+  blocked: project = {project} AND status = Blocked
+  review: project = {project} AND status = "In Review" ORDER BY updated ASC
+
+theme: tokyonight            # tokyonight, catppuccin, gruvbox, nord
+
+tui:
+  start: home                # home, issues, board, sprint, backlog, mine, ...
+  watch_interval: 5m         # poll watched issues; 0 disables
+  bell: false                # ring the terminal bell on notifications

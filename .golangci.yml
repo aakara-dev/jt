@@ -37,6 +37,13 @@ linters:
       - third_party$
       - builtin$
       - examples$
+    rules:
+      # TUI layout is sized in cells and key handling is one switch per
+      # view; magic-number and complexity checks are noise there.
+      - path: internal/tui/
+        linters: [mnd, gocyclo]
+      - path: _test\.go
+        linters: [gocyclo, prealloc]
 formatters:
   enable:
     - gofmt

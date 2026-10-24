@@ -140,3 +140,8 @@ func TestBoardStats(t *testing.T) {
 	assert.Contains(t, s, "By assignee")
 	assert.Contains(t, s, "Ada Lovelace")
 }
+
+func TestHomeHighlightsOneRowWhenIssuesRepeat(t *testing.T) {
+	h := newHarness(t, &fakeBackend{issues: sampleIssues(2)}, Options{Start: "home"})
+	assert.Equal(t, 1, strings.Count(h.screen(), "▌"), "same issue in every section, one cursor")
+}

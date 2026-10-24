@@ -187,7 +187,7 @@ func (whichKey) Render(st styles, width, _ int) string {
 		groups[e.Group] = append(groups[e.Group], e)
 	}
 	colW := 24
-	var cols []string
+	cols := make([]string, 0, len(order))
 	for _, g := range order {
 		lines := []string{st.Accent2.Bold(true).Render(g)}
 		for _, e := range groups[g] {
@@ -223,7 +223,8 @@ func (h helpPopup) Render(st styles, width, _ int) string {
 		for _, x := range hints {
 			kw = max(kw, lipgloss.Width(x.Key))
 		}
-		lines := []string{st.Accent2.Bold(true).Render(title)}
+		lines := make([]string, 0, len(hints)+1)
+		lines = append(lines, st.Accent2.Bold(true).Render(title))
 		for _, x := range hints {
 			lines = append(lines, st.Key.Render(fit(x.Key, kw))+"  "+st.Value.Render(x.Desc))
 		}

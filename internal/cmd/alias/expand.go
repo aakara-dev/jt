@@ -138,7 +138,9 @@ func Expand(root *cobra.Command, args []string, aliases map[string]string, vars 
 		}
 		return &Expansion{Shell: shell, Args: args[1:], Env: envs}, nil
 	}
-	rest := append(lead, args[1:]...)
+	rest := make([]string, 0, len(lead)+len(args)-1)
+	rest = append(rest, lead...)
+	rest = append(rest, args[1:]...)
 
 	used := map[int]bool{}
 	var subErr error

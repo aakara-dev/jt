@@ -149,12 +149,12 @@ func (p *searchPopup) recentResults() []searchResult {
 }
 
 func (p *searchPopup) savedResults(q string) []searchResult {
-	var items []pickItem
 	names := make([]string, 0, len(p.sess.Queries))
 	for n := range p.sess.Queries {
 		names = append(names, n)
 	}
 	sort.Strings(names)
+	items := make([]pickItem, 0, len(names)+len(p.favourites))
 	for _, n := range names {
 		items = append(items, pickItem{Label: n, Detail: "saved", Value: p.sess.ExpandJQL(p.sess.Queries[n])})
 	}
