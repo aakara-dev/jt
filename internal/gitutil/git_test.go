@@ -17,6 +17,10 @@ func TestIssueKey(t *testing.T) {
 		"main":                   "",
 		"release/2024-10":        "",
 		"user/aakara/DATA-9-wip": "DATA-9",
+		// An uppercase key wins over an earlier lowercase look-alike.
+		"utf-8/DATA-4-encoding":              "DATA-4",
+		"dependabot/go_modules/x/net-0.23.0": "NET-0",
+		"spike/python-3-upgrade-OPS-12":      "OPS-12",
 	}
 	for branch, want := range cases {
 		assert.Equal(t, want, IssueKey(branch), branch)
