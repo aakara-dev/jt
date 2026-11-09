@@ -3,6 +3,7 @@ package standup
 import (
 	"fmt"
 	"io"
+	"regexp"
 	"strings"
 	"time"
 
@@ -43,11 +44,15 @@ func NewCmdStandup() *cobra.Command {
 	return &cmd
 }
 
+// sinceRe is the relative-date subset --since accepts; it is pasted into
+// JQL, so anything else would produce an invalid (or injected) query.
+var sinceRe = regexp.MustCompile(`^\d+[dh]$`)
+
 // sinceClause returns a JQL date expression for the start of "yesterday".
 // On Mondays that is Friday morning.
 func sinceClause(flag string, now time.Time) (string, error) {
 	if flag != "" {
-		if !strings.HasSuffix(flag, "d") && !strings.HasSuffix(flag, "h") {
+		if !sinceRe.MatchString(flag) {
 			return "", fmt.Errorf("--since must look like 1d or 12h")
 		}
 		return "-" + flag, nil

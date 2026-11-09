@@ -25,8 +25,13 @@ func TestSinceClause(t *testing.T) {
 	got, _ = sinceClause("2d", tuesday)
 	assert.Equal(t, "-2d", got)
 
-	_, err = sinceClause("yesterday", tuesday)
-	assert.Error(t, err)
+	got, _ = sinceClause("12h", tuesday)
+	assert.Equal(t, "-12h", got)
+
+	for _, bad := range []string{"yesterday", "d", "1.5d", "-1d", "1 d", "2days"} {
+		_, err = sinceClause(bad, tuesday)
+		assert.Error(t, err, bad)
+	}
 }
 
 func TestRender(t *testing.T) {
