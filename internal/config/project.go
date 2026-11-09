@@ -161,7 +161,8 @@ func (f *File) UseProject(name string) (string, error) {
 	if err := f.Set(name, KeyCurrentProject); err != nil {
 		return "", err
 	}
-	if current != "" {
+	// A current_project that no longer exists is not worth swapping back to.
+	if current != "" && f.HasProject(current) {
 		if err := f.Set(current, KeyPreviousProject); err != nil {
 			return "", err
 		}

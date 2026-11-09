@@ -186,7 +186,14 @@ func applyProject() error {
 		return nil //nolint:nilerr // no readable config: nothing to overlay
 	}
 	if selector == "" {
-		return jiraConfig.ApplyProject(viper.GetViper(), f.GetString(jiraConfig.KeyCurrentProject))
+		current := f.GetString(jiraConfig.KeyCurrentProject)
+		if current != "" && !f.HasProject(current) {
+			// Failing here would also block `jt project use`, the command
+			// that fixes it, so fall back to the top-level settings.
+			cmdutil.Warn("current project %q is not saved; using the default project (fix with 'jt project use NAME')", current)
+			return nil
+		}
+		return jiraConfig.ApplyProject(viper.GetViper(), current)
 	}
 	name := f.Resolve(selector)
 	if name == "" {

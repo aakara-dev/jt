@@ -138,9 +138,9 @@ func Expand(root *cobra.Command, args []string, aliases map[string]string, vars 
 		}
 		return &Expansion{Shell: shell, Args: args[1:], Env: envs}, nil
 	}
-	rest := make([]string, 0, len(lead)+len(args)-1)
-	rest = append(rest, lead...)
-	rest = append(rest, args[1:]...)
+	// $N counts only the alias's own arguments; global flags peeled off the
+	// front are re-appended after them so they cannot shift the numbering.
+	rest := args[1:]
 
 	used := map[int]bool{}
 	var subErr error
@@ -166,6 +166,7 @@ func Expand(root *cobra.Command, args []string, aliases map[string]string, vars 
 			expanded = append(expanded, a)
 		}
 	}
+	expanded = append(expanded, lead...)
 	return &Expansion{Args: expanded}, nil
 }
 

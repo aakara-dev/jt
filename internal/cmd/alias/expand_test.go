@@ -41,6 +41,7 @@ func TestExpand(t *testing.T) {
 		{"no args", nil, nil, ""},
 		{"shell with global flags", []string{"--project=ops", "sh", "x"}, &Expansion{Shell: `echo aakara "$@"`, Args: []string{"x"}, Env: []string{"JT_PROJECT=ops"}}, ""},
 		{"positional", []string{"start", "DATA-1"}, &Expansion{Args: []string{"issue", "move", "DATA-1", "In Progress"}}, ""},
+		{"global flags before positional", []string{"-p", "ops", "start", "DATA-1"}, &Expansion{Args: []string{"issue", "move", "DATA-1", "In Progress", "-p", "ops"}}, ""},
 		{"positional with quote", []string{"start", "it's"}, &Expansion{Args: []string{"issue", "move", "it's", "In Progress"}}, ""},
 		{"extra args appended", []string{"blocked", "--plain"}, &Expansion{Args: []string{"issue", "list", "-s", "Blocked", "-pDATA", "--plain"}}, ""},
 		{"missing positional", []string{"start"}, nil, `alias "start" needs argument $1`},

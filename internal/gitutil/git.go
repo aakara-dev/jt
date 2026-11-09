@@ -13,11 +13,20 @@ import (
 // ErrNotARepo is returned outside a git work tree.
 var ErrNotARepo = errors.New("not inside a git repository")
 
-var keyRe = regexp.MustCompile(`(?i)\b([a-z][a-z0-9_]+-\d+)\b`)
+var (
+	upperKeyRe = regexp.MustCompile(`\b([A-Z][A-Z0-9_]+-\d+)\b`)
+	keyRe      = regexp.MustCompile(`(?i)\b([a-z][a-z0-9_]+-\d+)\b`)
+)
 
 // IssueKey extracts the first issue key from a branch name, e.g.
 // "feat/DATA-12-add-retry" → "DATA-12". It returns "" if there is none.
+// Jira keys are uppercase, so an uppercase match is preferred over earlier
+// lowercase look-alikes such as "utf-8" or "python-3"; a lowercase key is
+// still accepted when it is the only candidate.
 func IssueKey(branch string) string {
+	if m := upperKeyRe.FindStringSubmatch(branch); m != nil {
+		return m[1]
+	}
 	m := keyRe.FindStringSubmatch(branch)
 	if m == nil {
 		return ""
