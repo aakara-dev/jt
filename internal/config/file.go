@@ -182,7 +182,13 @@ func (f *File) Save() error {
 		return err
 	}
 	out := buf.Bytes()
-	dir := filepath.Dir(f.path)
+	// Write through a symlink (e.g. a config managed by dotfiles) instead of
+	// replacing the link with a regular file.
+	path := f.path
+	if resolved, err := filepath.EvalSymlinks(path); err == nil {
+		path = resolved
+	}
+	dir := filepath.Dir(path)
 	if err := os.MkdirAll(dir, dirPerm); err != nil {
 		return err
 	}
@@ -203,7 +209,7 @@ func (f *File) Save() error {
 	if err := tmp.Close(); err != nil {
 		return err
 	}
-	return os.Rename(tmp.Name(), f.path)
+	return os.Rename(tmp.Name(), path)
 }
 
 func mapValue(m *yaml.Node, key string) *yaml.Node {

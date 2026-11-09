@@ -169,3 +169,32 @@ func TestFileResolve(t *testing.T) {
 	assert.Equal(t, "", f.Resolve("NOPE"))
 	assert.Equal(t, "", f.Resolve(""))
 }
+
+func TestFileUseProjectSkipsStaleCurrent(t *testing.T) {
+	p := writeSample(t)
+	f, err := LoadFile(p)
+	require.NoError(t, err)
+	require.NoError(t, f.Set("gone", KeyCurrentProject))
+
+	_, err = f.UseProject("ops")
+	require.NoError(t, err)
+	assert.Equal(t, "", f.GetString(KeyPreviousProject), "a missing project is not remembered as previous")
+}
+
+func TestFileSaveFollowsSymlink(t *testing.T) {
+	target := writeSample(t)
+	link := filepath.Join(t.TempDir(), "config.yml")
+	require.NoError(t, os.Symlink(target, link))
+
+	f, err := LoadFile(link)
+	require.NoError(t, err)
+	require.NoError(t, f.Set("nord", "theme"))
+	require.NoError(t, f.Save())
+
+	info, err := os.Lstat(link)
+	require.NoError(t, err)
+	assert.NotZero(t, info.Mode()&os.ModeSymlink, "the symlink is kept")
+	out, err := os.ReadFile(target)
+	require.NoError(t, err)
+	assert.Contains(t, string(out), "theme: nord", "the link target is updated")
+}
